@@ -1,8 +1,8 @@
 """ Модуль содержит процедуры вызова стандартных диалоговых окон """
 
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QMessageBox
 
-def askYesOrNo(p_text):
+def ask_yes_or_no(p_text):
     """ Процедура вызывает стандартное окно выбора одной \
         из двух альтернатив и возвращает True в случае нажатия \
         кнопки <Yes> и False - если была нажата <No> """
@@ -14,10 +14,10 @@ def askYesOrNo(p_text):
     l_msgbox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
     l_msgbox.setDefaultButton(QMessageBox.No)
     l_msgbox.setEscapeButton(QMessageBox.Close)
-    return (l_msgbox.exec() == QMessageBox.Yes)
+    return l_msgbox.exec() == QMessageBox.Yes
 
 
-def errorOccured(p_text,p_inform_text=""):
+def error_occured(p_text, p_inform_text=""):
     """ Процедура выводит стандартное сообщение об ошибке """
 
     l_msgbox = QMessageBox()
