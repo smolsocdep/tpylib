@@ -5,7 +5,7 @@
 
 #import collections
 #from PyQt5 import QtCore, QtWidgets, QtGui
-import constants as cns
+#import constants as cns
 
 
 SQL_QUERY_COLUMNS_INFO = "select column_name, data_type, character_maximum_length \
@@ -18,6 +18,9 @@ FIELD_WIDTH_ORDER = 2
 
 CONTROL_INSTANCE = "control"
 CONTROL_FIELDNAME = "fieldname"
+
+TG_FIELD_NOT_FOUND = -1
+
 
 class CTableGuard():
     """ Класс реализует защиту БД """
@@ -68,7 +71,62 @@ class CTableGuard():
             return self.c_field_names.index(p_field_name)
         except ValueError:
 
-            return cns.TG_FIELD_NOT_FOUND
+            return TG_FIELD_NOT_FOUND
+
+
+    def __reopen_query(self):
+        """ Производит выборку данных для редактирования/добавления """
+
+        try:
+
+            self.c_source_cursor = self.c_kernel.get_connection().cursor()
+            #*** Получим выборку
+            self.c_source_cursor.execute(self.c_source_query)
+            
+            return True
+
+        except:
+            
+            return False
+
+
+    def __query_metadata(self):
+        """ Получает данные о полях заданной таблицы """
+        
+        #*** Получим курсор
+        l_meta_cursor = self.c_kernel.get_connection().cursor()
+        #*** Получим выборку
+        l_meta_cursor.execute(SQL_QUERY_COLUMNS_INFO % self.c_table_name)
+        #*** Вытащим все данные из выборки
+        l_meta_data = l_meta_cursor.fetchall()
+        #*** Получим кол-во строк
+        l_rows = len(l_meta_data)
+        #*** если выборка не пустая...
+        if l_rows > 0:
+
+            self.c_field_count = l_rows   
+            for l_row in range(l_rows):
+                 
+                self.c_field_names.append(l_meta_data[l_row][FIELD_NAME_ORDER])
+                self.c_field_types.append(l_meta_data[l_row][FIELD_TYPE_ORDER])
+                self.c_field_widthes.append(l_meta_data[l_row][FIELD_WIDTH_ORDER])
+
+
+    def add_control(self, p_control, p_field_name):
+        """ Добавляет очередной элемент в список """
+
+        assert p_control is not None, "Assert: [table_guard.add_control]: \
+            No <p_control> parameter specified!"
+        assert p_field_name is not None, "Assert: [table_guard.add_control]: \
+            No <p_field_name> parameter specified!"
+        if self.__find_field_in_list(p_field_name) == TG_FIELD_NOT_FOUND:
+
+            return None # ????
+        l_control = {}
+        l_control[CONTROL_INSTANCE] = p_control
+        l_control[CONTROL_FIELDNAME] = p_field_name
+        self.c_controls.append(l_control)
+        return l_control
 
 
     def get_field_length(self, p_field_name):
@@ -77,7 +135,7 @@ class CTableGuard():
         assert p_field_name is not None, "Assert: [table_guard.get_field_length]: \
             No <p_field_name> parameter specified!"
         l_field_idx = self.__find_field_in_list(p_field_name)
-        if l_field_idx == cns.TG_FIELD_NOT_FOUND:
+        if l_field_idx == TG_FIELD_NOT_FOUND:
 
             return None
         return self.c_field_widthes[l_field_idx]
@@ -91,34 +149,27 @@ class CTableGuard():
         self.c_source_query = p_query
 
 
-    def add_control(self, p_control, p_field_name):
-        """ Добавляет очередной элемент в список """
 
-        assert p_control is not None, "Assert: [table_guard.add_control]: \
-            No <p_control> parameter specified!"
-        assert p_field_name is not None, "Assert: [table_guard.add_control]: \
-            No <p_field_name> parameter specified!"
-        if self.__find_field_in_list(p_field_name) == cns.TG_FIELD_NOT_FOUND:
 
-            return None # ????
-        l_control = {}
-        l_control[CONTROL_INSTANCE] = p_control
-        l_control[CONTROL_FIELDNAME] = p_field_name
-        self.c_controls.append(l_control)
-        return l_control
-
+    # Балбес, сначала нужно из выборки взять имена полей, типы и длину!
+    
+    
     def load_data(self):
         """ Загружает данные в соответствующие элементы и задает макс. длину
             строк для эдитов """
 
         print(self.c_field_names)
+        #*** Перебираем сохраненные контролы
         for l_control in self.c_controls:
 
+            #*** Каждый l_control - это словарь!
             l_field_name = l_control[CONTROL_FIELDNAME]
             l_field_idx = self.__find_field_in_list(l_field_name)
-            if l_field_idx != cns.TG_FIELD_NOT_FOUND:
+            if l_field_idx != TG_FIELD_NOT_FOUND:
 
                 l_field_type = self.c_field_types[l_field_idx]
                 l_field_width = self.c_field_widthes[l_field_idx]
+                if l_field_type == 
+                l_control[CONTROL_INSTANCE]
                 print("T: ", l_field_type)
                 print("W: ", l_field_width)
