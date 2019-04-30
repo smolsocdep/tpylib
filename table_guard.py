@@ -5,7 +5,7 @@
 
 #import collections
 from PyQt5 import QtWidgets
-#, QtGui QtCore, 
+#, QtGui QtCore,
 
 
 SQL_QUERY_COLUMNS_INFO = "select column_name, data_type, character_maximum_length \
@@ -179,30 +179,47 @@ class CTableGuard():
         #*** Перебираем сохраненные контролы
         for l_control in self.c_controls:
 
+
+            #--- print("Con:", l_control)                
             #*** Каждый l_control - это словарь!
+            #* Название поля
             l_field_name = l_control[CONTROL_FIELDNAME]
+            #* Номер поля в выборке
+            l_field_number = int(l_control[CONTROL_FIELDNUMBER])
+            #* Индекс поля в списке полей c_field_names
             l_field_idx = self.__find_field_in_list(l_field_name)
             if l_field_idx != TG_FIELD_NOT_FOUND:
-
+                
+                #* Тип поля
                 l_field_type = self.c_field_types[l_field_idx]
+                #* Максимальная ширина поля
                 l_field_width = self.c_field_widthes[l_field_idx]
-
+                #* Значение поля 
+                print("Name: ", l_field_name)
+                print("Num: ", l_field_number)
+                print("Idx: ", l_field_idx)
+                print("Type: ", l_field_type)
+                print("Width: ", l_field_width)
+                print("Data: ", self.c_source_data)
+                #!!! Падает с ошибкой - индекс за пределами диапазона!
+                l_field_value = self.c_source_data[l_field_number]
                 #*** Смотрим тип поля:
                 if l_field_type == FIELD_TYPE_VARCHAR:
 
-                    QtWidgets.QLineEdit(l_control[CONTROL_INSTANCE]).setText( \
-                                        self.c_source_data[l_control[CONTROL_FIELDNUMBER]])
-
+                    #*** Строка 
+                    QtWidgets.QLineEdit(l_control[CONTROL_INSTANCE]).setText(l_field_value)
+                    QtWidgets.QLineEdit(l_control[CONTROL_INSTANCE]).setMaxLength(l_field_width)
                 elif l_field_type == FIELD_TYPE_INTEGER:
 
-                    QtWidgets.QLineEdit(l_control[CONTROL_INSTANCE]).setText( \
-                                        str(self.c_source_data[l_control[CONTROL_FIELDNUMBER]]))
+                    #*** Число (кстати, остальные числовые типы надо будет предусмотреть!)
+                    QtWidgets.QLineEdit(l_control[CONTROL_INSTANCE]).setText(str(l_field_value))
 
                 elif l_field_type == FIELD_TYPE_DATE:
-                    QtWidgets.QDateEdit(l_control[CONTROL_INSTANCE]).setDate( \
-                                        self.c_source_data[l_control[CONTROL_FIELDNUMBER]])
+                    
+                    #*** Дата
+                    QtWidgets.QDateEdit(l_control[CONTROL_INSTANCE]).setDate(l_field_value)
                 else:
                     pass
-                l_control[CONTROL_INSTANCE]
-                print("T: ", l_field_type)
-                print("W: ", l_field_width)
+                #l_control[CONTROL_INSTANCE]
+                #print("T: ", l_field_type)
+                #print("W: ", l_field_width)
