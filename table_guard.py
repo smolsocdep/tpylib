@@ -4,8 +4,8 @@
 
 
 #import collections
-#from PyQt5 import QtCore, QtWidgets, QtGui
-#import constants as cns
+from PyQt5 import QtWidgets
+#, QtGui QtCore, 
 
 
 SQL_QUERY_COLUMNS_INFO = "select column_name, data_type, character_maximum_length \
@@ -18,9 +18,13 @@ FIELD_WIDTH_ORDER = 2
 
 CONTROL_INSTANCE = "control"
 CONTROL_FIELDNAME = "fieldname"
+CONTROL_FIELDNUMBER = "fieldnumber"
 
 TG_FIELD_NOT_FOUND = -1
 
+FIELD_TYPE_VARCHAR = "character varying"
+FIELD_TYPE_INTEGER = "integer"
+FIELD_TYPE_DATE = "date"
 
 class CTableGuard():
     """ Класс реализует защиту БД """
@@ -33,6 +37,9 @@ class CTableGuard():
     c_kernel = None
     c_table_name = ""
     c_source_query = ""
+    c_source_data = None
+    c_source_cursor = None
+
 
     def __init__(self, p_kernel, p_table_name):
         """ Конструктор """
@@ -82,17 +89,17 @@ class CTableGuard():
             self.c_source_cursor = self.c_kernel.get_connection().cursor()
             #*** Получим выборку
             self.c_source_cursor.execute(self.c_source_query)
-            
+            self.c_source_data = self.c_source_cursor.fetchall()
             return True
 
         except:
-            
+
             return False
 
 
     def __query_metadata(self):
         """ Получает данные о полях заданной таблицы """
-        
+
         #*** Получим курсор
         l_meta_cursor = self.c_kernel.get_connection().cursor()
         #*** Получим выборку
@@ -104,27 +111,30 @@ class CTableGuard():
         #*** если выборка не пустая...
         if l_rows > 0:
 
-            self.c_field_count = l_rows   
+            self.c_field_count = l_rows
             for l_row in range(l_rows):
-                 
+
                 self.c_field_names.append(l_meta_data[l_row][FIELD_NAME_ORDER])
                 self.c_field_types.append(l_meta_data[l_row][FIELD_TYPE_ORDER])
                 self.c_field_widthes.append(l_meta_data[l_row][FIELD_WIDTH_ORDER])
 
 
-    def add_control(self, p_control, p_field_name):
+    def add_control(self, p_control, p_field_name, p_field_number):
         """ Добавляет очередной элемент в список """
 
         assert p_control is not None, "Assert: [table_guard.add_control]: \
             No <p_control> parameter specified!"
         assert p_field_name is not None, "Assert: [table_guard.add_control]: \
             No <p_field_name> parameter specified!"
+        assert p_field_number is not None, "Assert: [table_guard.add_control]: \
+            No <p_field_number> parameter specified!"
         if self.__find_field_in_list(p_field_name) == TG_FIELD_NOT_FOUND:
 
             return None # ????
         l_control = {}
         l_control[CONTROL_INSTANCE] = p_control
         l_control[CONTROL_FIELDNAME] = p_field_name
+        l_control[CONTROL_FIELDNUMBER] = p_field_number
         self.c_controls.append(l_control)
         return l_control
 
@@ -152,13 +162,20 @@ class CTableGuard():
 
 
     # Балбес, сначала нужно из выборки взять имена полей, типы и длину!
-    
-    
+
+
     def load_data(self):
         """ Загружает данные в соответствующие элементы и задает макс. длину
             строк для эдитов """
 
         print(self.c_field_names)
+
+        #*** Получим метаданные выбранной таблицы
+        self.__query_metadata()
+
+        #*** Откроем выборку для загрузки в контролы
+        self.__reopen_query()
+
         #*** Перебираем сохраненные контролы
         for l_control in self.c_controls:
 
@@ -169,7 +186,23 @@ class CTableGuard():
 
                 l_field_type = self.c_field_types[l_field_idx]
                 l_field_width = self.c_field_widthes[l_field_idx]
-                if l_field_type == 
+
+                #*** Смотрим тип поля:
+                if l_field_type == FIELD_TYPE_VARCHAR:
+
+                    QtWidgets.QLineEdit(l_control[CONTROL_INSTANCE]).setText( \
+                                        self.c_source_data[l_control[CONTROL_FIELDNUMBER]])
+
+                elif l_field_type == FIELD_TYPE_INTEGER:
+
+                    QtWidgets.QLineEdit(l_control[CONTROL_INSTANCE]).setText( \
+                                        str(self.c_source_data[l_control[CONTROL_FIELDNUMBER]]))
+
+                elif l_field_type == FIELD_TYPE_DATE:
+                    QtWidgets.QDateEdit(l_control[CONTROL_INSTANCE]).setDate( \
+                                        self.c_source_data[l_control[CONTROL_FIELDNUMBER]])
+                else:
+                    pass
                 l_control[CONTROL_INSTANCE]
                 print("T: ", l_field_type)
                 print("W: ", l_field_width)
