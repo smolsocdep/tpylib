@@ -5,6 +5,8 @@
 
 #import collections
 from PyQt5 import QtWidgets
+# from pip._vendor.pyparsing import line
+# from pylint.test.functional.undefined_variable import Self
 #, QtGui QtCore,
 
 
@@ -29,10 +31,12 @@ FIELD_TYPE_DATE = "date"
 class CTableGuard():
     """ Класс реализует защиту БД """
 
+    #*** Эти списки заполняются из выборки 
     c_field_count = 0
     c_field_names = []
     c_field_types = []
     c_field_widthes = []
+
     c_controls = []
     c_kernel = None
     c_table_name = ""
@@ -52,20 +56,7 @@ class CTableGuard():
         self.c_table_name = p_table_name
 
         #*** Читаем описания полей
-        l_cursor = self.c_kernel.get_connection().cursor()
-        l_sql = SQL_QUERY_COLUMNS_INFO % self.c_table_name
-        l_cursor.execute(l_sql)
-        l_data = l_cursor.fetchall()
-        self.c_field_count = len(l_data)
-        if self.c_field_count:
-            for l_row in l_data:
-
-                self.c_field_names.append(l_row[FIELD_NAME_ORDER])
-                self.c_field_types.append(l_row[FIELD_TYPE_ORDER])
-                self.c_field_widthes.append(l_row[FIELD_WIDTH_ORDER])
-            # print(self.c_field_names)
-            # print(self.c_field_types)
-            # print(self.c_field_widthes)
+        self.__query_metadata()
 
 
     def __find_field_in_list(self, p_field_name):
@@ -81,7 +72,7 @@ class CTableGuard():
             return TG_FIELD_NOT_FOUND
 
 
-    def __reopen_query(self):
+    def __reopen_source_query(self):
         """ Производит выборку данных для редактирования/добавления """
 
         try:
@@ -103,7 +94,8 @@ class CTableGuard():
         #*** Получим курсор
         l_meta_cursor = self.c_kernel.get_connection().cursor()
         #*** Получим выборку
-        l_meta_cursor.execute(SQL_QUERY_COLUMNS_INFO % self.c_table_name)
+        l_sql = SQL_QUERY_COLUMNS_INFO % self.c_table_name
+        l_meta_cursor.execute(l_sql)
         #*** Вытащим все данные из выборки
         l_meta_data = l_meta_cursor.fetchall()
         #*** Получим кол-во строк
@@ -151,6 +143,17 @@ class CTableGuard():
         return self.c_field_widthes[l_field_idx]
 
 
+    def get_field_data(self, p_field_number):
+        """ Возвращает значение заданного поля """
+
+        assert p_field_number is not None, "Assert: [table_guard.get_field_data]: \
+            No <p_field_number> parameter specified!"
+        if len(self.c_source_data)-1>p_field_number:
+            
+            return self.c_source_data[p_field_number]
+        return None
+
+
     def set_source_query(self, p_query):
         """ Задает запрос для загрузки данных в компоненты """
 
@@ -174,7 +177,7 @@ class CTableGuard():
         self.__query_metadata()
 
         #*** Откроем выборку для загрузки в контролы
-        self.__reopen_query()
+        self.__reopen_source_query()
 
         #*** Перебираем сохраненные контролы
         for l_control in self.c_controls:
@@ -183,39 +186,43 @@ class CTableGuard():
             #--- print("Con:", l_control)                
             #*** Каждый l_control - это словарь!
             #* Название поля
+            print("Cont: ", l_control)
             l_field_name = l_control[CONTROL_FIELDNAME]
             #* Номер поля в выборке
             l_field_number = int(l_control[CONTROL_FIELDNUMBER])
             #* Индекс поля в списке полей c_field_names
             l_field_idx = self.__find_field_in_list(l_field_name)
             if l_field_idx != TG_FIELD_NOT_FOUND:
-                
+
                 #* Тип поля
                 l_field_type = self.c_field_types[l_field_idx]
                 #* Максимальная ширина поля
                 l_field_width = self.c_field_widthes[l_field_idx]
                 #* Значение поля 
-                print("Name: ", l_field_name)
-                print("Num: ", l_field_number)
-                print("Idx: ", l_field_idx)
-                print("Type: ", l_field_type)
-                print("Width: ", l_field_width)
-                print("Data: ", self.c_source_data)
-                #!!! Падает с ошибкой - индекс за пределами диапазона!
-                l_field_value = self.c_source_data[l_field_number]
+#                 print("Name: ", l_field_name)
+#                 print("Num: ", l_field_number)
+#                 print("Idx: ", l_field_idx)
+#                 print("Type: ", l_field_type)
+#                 print("Width: ", l_field_width)
+#                 print("Data: ", self.c_source_data)
+#                 print  ("Len: ", len(self.c_source_data[0]))
+#                 print("*****************")
+                l_field_value = self.c_source_data[0][l_field_number]
                 #*** Смотрим тип поля:
                 if l_field_type == FIELD_TYPE_VARCHAR:
 
                     #*** Строка 
-                    QtWidgets.QLineEdit(l_control[CONTROL_INSTANCE]).setText(l_field_value)
-                    QtWidgets.QLineEdit(l_control[CONTROL_INSTANCE]).setMaxLength(l_field_width)
+#                     print("VarChar: ",l_field_value)
+                    line_edit = QtWidgets.QLineEdit(l_control[CONTROL_INSTANCE]) 
+                    line_edit.setText(l_field_value)
+                    line_edit.setMaxLength(l_field_width)
                 elif l_field_type == FIELD_TYPE_INTEGER:
 
                     #*** Число (кстати, остальные числовые типы надо будет предусмотреть!)
                     QtWidgets.QLineEdit(l_control[CONTROL_INSTANCE]).setText(str(l_field_value))
 
                 elif l_field_type == FIELD_TYPE_DATE:
-                    
+
                     #*** Дата
                     QtWidgets.QDateEdit(l_control[CONTROL_INSTANCE]).setDate(l_field_value)
                 else:
