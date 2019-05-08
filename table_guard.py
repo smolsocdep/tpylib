@@ -31,7 +31,7 @@ FIELD_TYPE_DATE = "date"
 class CTableGuard():
     """ Класс реализует защиту БД """
 
-    #*** Эти списки заполняются из выборки 
+    #*** Эти списки заполняются из выборки
     c_field_count = 0
     c_field_names = []
     c_field_types = []
@@ -148,8 +148,8 @@ class CTableGuard():
 
         assert p_field_number is not None, "Assert: [table_guard.get_field_data]: \
             No <p_field_number> parameter specified!"
-        if len(self.c_source_data)-1>p_field_number:
-            
+        if len(self.c_source_data)-1 > p_field_number:
+
             return self.c_source_data[p_field_number]
         return None
 
@@ -183,7 +183,7 @@ class CTableGuard():
         for l_control in self.c_controls:
 
 
-            #--- print("Con:", l_control)                
+            #--- print("Con:", l_control)
             #*** Каждый l_control - это словарь!
             #* Название поля
             print("Cont: ", l_control)
@@ -198,7 +198,7 @@ class CTableGuard():
                 l_field_type = self.c_field_types[l_field_idx]
                 #* Максимальная ширина поля
                 l_field_width = self.c_field_widthes[l_field_idx]
-                #* Значение поля 
+                #* Значение поля
 #                 print("Name: ", l_field_name)
 #                 print("Num: ", l_field_number)
 #                 print("Idx: ", l_field_idx)
@@ -211,9 +211,9 @@ class CTableGuard():
                 #*** Смотрим тип поля:
                 if l_field_type == FIELD_TYPE_VARCHAR:
 
-                    #*** Строка 
+                    #*** Строка
 #                     print("VarChar: ",l_field_value)
-                    line_edit = QtWidgets.QLineEdit(l_control[CONTROL_INSTANCE]) 
+                    line_edit = QtWidgets.QLineEdit(l_control[CONTROL_INSTANCE])
                     line_edit.setText(l_field_value)
                     line_edit.setMaxLength(l_field_width)
                 elif l_field_type == FIELD_TYPE_INTEGER:
