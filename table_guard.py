@@ -167,6 +167,28 @@ class CTableGuard():
     # Балбес, сначала нужно из выборки взять имена полей, типы и длину!
 
 
+    def load_string_data(self, p_field_name):
+        """ Загрузка данных в строковое поле и установка макс. длины """
+
+        assert p_field_name is not None, "Assert: [table_guard.get_field_length]: \
+            No <p_field_name> parameter specified!"
+        l_field_idx = self.__find_field_in_list(p_field_name)
+        if l_field_idx != TG_FIELD_NOT_FOUND:
+
+            #* Тип поля
+            l_field_type = self.c_field_types[l_field_idx]
+                #* Максимальная ширина поля
+                l_field_width = self.c_field_widthes[l_field_idx]
+                if l_field_type == FIELD_TYPE_VARCHAR:
+
+                    #*** Строка
+#                     print("VarChar: ",l_field_value)
+                    line_edit = QtWidgets.QLineEdit(l_control[CONTROL_INSTANCE])
+                    line_edit.setText(l_field_value)
+                    line_edit.setMaxLength(l_field_width)
+       
+
+
     def load_data(self):
         """ Загружает данные в соответствующие элементы и задает макс. длину
             строк для эдитов """
