@@ -39,36 +39,41 @@ class CTableGuard():
     c_field_types = []
     c_field_widthes = []
 
-    c_controls = []
+#     c_controls = []
     c_kernel = None
     c_table_name = ""
     c_source_query = ""
     c_source_data = None
     c_source_cursor = None
+    c_field_list = None
 
-
-    def __init__(self, p_kernel, p_table_name):
+    def __init__(self, p_kernel, p_table_name): #+++
         """ Конструктор """
 
         assert p_kernel is not None, "Assert: [table_guard.__init__]: \
             No <p_kernel> parameter specified!"
-        self.c_kernel = p_kernel
         assert p_table_name is not None, "Assert: [table_guard.__init__]: \
             No <p_table_name> parameter specified!"
+
+        self.c_kernel = p_kernel
         self.c_table_name = p_table_name
 
         #*** Читаем описания полей
         self.__query_metadata()
 
 
-    def __reopen_source_query(self):
+    def __reopen_source_query(self): #+**
         """ Производит выборку данных для редактирования/добавления """
+        from os.path import join
 
         try:
 
             self.c_source_cursor = self.c_kernel.get_connection().cursor()
             #*** Получим выборку
-            self.c_source_cursor.execute(self.c_source_query)
+            l_fields = ",".join(self.c_field_list)
+            l_query = self.c_source_query % l_fields
+            print(l_query)
+            self.c_source_cursor.execute(l_query)
             self.c_source_data = self.c_source_cursor.fetchall()
             print("Data: ", self.c_source_data)
             return True
@@ -153,21 +158,26 @@ class CTableGuard():
 #             return self.c_source_data[p_field_number]
 #         return None
 
-
-    def set_source_query(self, p_query):
+    
+    def set_source_query(self, p_query): #+++
         """ Задает запрос для загрузки данных в компоненты """
 
         assert p_query is not None, "Assert: [table_guard.set_source_query]: \
             No <p_query> parameter specified!"
+        
         self.c_source_query = p_query
+    
+    
+    def set_field_list(self, p_field_list): #+++
+        """ Задает список полей для выборки """
 
+        assert p_field_list is not None, "Assert: [table_guard.set_field_list]: \
+            No <p_field_list> parameter specified!"
 
+        self.c_field_list = p_field_list
+    
 
-
-    # Балбес, сначала нужно из выборки взять имена полей, типы и длину!
-
-
-    def prepare(self):
+    def prepare(self): #???
         """ Получает данные из БД"""
 
         #*** Получим метаданные выбранной таблицы
