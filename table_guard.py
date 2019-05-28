@@ -202,11 +202,26 @@ class CTableGuard():
         assert p_field_idx is not None, "Assert: [table_guard.load_line_edit]: \
             No <p_field_idx> parameter specified!"
         
-        print("Field index: ", p_field_idx)
         l_field_name = self.c_field_list[p_field_idx]
-        print("Field name: ", l_field_name)
         if self.c_field_types[l_field_name] == "character varying":
+
             p_line_edit.setText(self.c_source_data[0][p_field_idx])
             p_line_edit.setMaxLength(self.c_field_widthes[l_field_name])
-        print("Type: ",self.c_field_types[l_field_name])
-        print("Width: ", self.c_field_widthes[l_field_name])    
+        #ToDo: Сделать обработку Integer'а и Float'а    
+
+    
+    def load_date_edit(self, p_date_edit, p_field_idx):
+        """ Загружает дату в редактор дат """    
+        
+        assert p_date_edit is not None, "Assert: [table_guard.load_date_edit]: \
+            No <p_date_edit> parameter specified!"
+        assert p_field_idx is not None, "Assert: [table_guard.load_date_edit]: \
+            No <p_field_idx> parameter specified!"
+            
+        l_field_name = self.c_field_list[p_field_idx]
+        if self.c_field_types[l_field_name] == "date":
+
+#             p_date_edit.setCalendarPopUp(True)
+            p_date_edit.setDate(self.c_source_data[0][p_field_idx])
+
+        #clear()
