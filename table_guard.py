@@ -95,21 +95,16 @@ class CTableGuard():
         l_meta_data = l_meta_cursor.fetchall()
         #*** Получим кол-во строк
         l_rows = len(l_meta_data)
-        print("Meta: ", l_meta_data)
+#         print("Meta: ", l_meta_data)
         #*** если выборка не пустая...
         if l_rows > 0:
-
-#             self.c_field_count = l_rows
             
-#             for l_row in range(l_rows):
             for l_meta_data_row in l_meta_data:
 
                 if self.c_field_list.count(l_meta_data_row[0]):
                     
                     self.c_field_types[l_meta_data_row[0]] = l_meta_data_row[1]
                     self.c_field_widthes[l_meta_data_row[0]] = l_meta_data_row[2]
-#             print("Types: ", self.c_field_types)            
-#             print("Widthes: ", self.c_field_widthes)            
 
     
     def set_source_query(self, p_query): #+++
@@ -194,7 +189,7 @@ class CTableGuard():
 #         return None
 
 
-    def load_line_edit(self, p_line_edit, p_field_idx):
+    def load_line_edit(self, p_line_edit, p_field_idx): #+++
         """ Загружает данные в строку ввода и задает макс. длину """    
 
         assert p_line_edit is not None, "Assert: [table_guard.load_line_edit]: \
@@ -202,15 +197,15 @@ class CTableGuard():
         assert p_field_idx is not None, "Assert: [table_guard.load_line_edit]: \
             No <p_field_idx> parameter specified!"
         
+        #ToDo: Сделать обработку Integer'а и Float'а    
         l_field_name = self.c_field_list[p_field_idx]
         if self.c_field_types[l_field_name] == "character varying":
 
             p_line_edit.setText(self.c_source_data[0][p_field_idx])
             p_line_edit.setMaxLength(self.c_field_widthes[l_field_name])
-        #ToDo: Сделать обработку Integer'а и Float'а    
 
     
-    def load_date_edit(self, p_date_edit, p_field_idx):
+    def load_date_edit(self, p_date_edit, p_field_idx): #+++
         """ Загружает дату в редактор дат """    
         
         assert p_date_edit is not None, "Assert: [table_guard.load_date_edit]: \
@@ -221,7 +216,4 @@ class CTableGuard():
         l_field_name = self.c_field_list[p_field_idx]
         if self.c_field_types[l_field_name] == "date":
 
-#             p_date_edit.setCalendarPopUp(True)
             p_date_edit.setDate(self.c_source_data[0][p_field_idx])
-
-        #clear()
