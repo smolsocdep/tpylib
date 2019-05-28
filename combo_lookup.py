@@ -20,6 +20,26 @@ class CComboLookup(object):
             No <p_query> parameter specified!"
 
         self.c_kernel = p_kernel
+        #*** В запросе должно быть только два поля - идентификатор и текст,
+        #*** идентификатор должен быть первым
         self.c_query = p_query
+
+    def load(self, p_combobox):
+        """ Загружает данные в комбобокс """
         
+        assert p_combobox is not None, "Assert: [combo_lookup.load]: \
+            No <p_combobox> parameter specified!"
+
+        l_source_cursor = self.c_kernel.get_connection().cursor()
+        #*** Получим выборку
+        l_source_cursor.execute(self.c_query)
+        l_source_data = l_source_cursor.fetchall()
+        #*** Обходим выборку
+        if l_source_data:
+            
+            for l_row in l_source_data:
+                
+                p_combobox.addItem(l_row[1])
+                self.c_id_dict[p_combobox.count()-1] = l_row[0]
+            #print(self.c_id_dict)
         
