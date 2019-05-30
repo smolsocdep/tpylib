@@ -188,6 +188,17 @@ class CTableGuard():
 #             return self.c_source_data[p_field_number]
 #         return None
 
+    
+    def get_field_value(self, p_field_idx):
+        """ Возвращает значение поля с указанным индексом """
+
+        assert p_field_idx is not None, "Assert: [table_guard.get_field_value]: \
+            No <p_field_idx> parameter specified!"
+        
+        print("Field: ", p_field_idx)
+        print("Data: ",self.c_source_data)
+        return self.c_source_data[0][p_field_idx]
+
 
     def load_line_edit(self, p_line_edit, p_field_idx): #+++
         """ Загружает данные в строку ввода и задает макс. длину """    
