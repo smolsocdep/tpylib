@@ -36,17 +36,17 @@ class CTableGuard():
 
     #*** Эти списки заполняются из выборки
     c_field_count = 0 #+
-#     c_field_names = []
     c_field_types = {}
     c_field_widthes = {}
 
-#     c_controls = []
     c_kernel = None
     c_table_name = ""
     c_source_query = ""
     c_source_data = None
     c_source_cursor = None
     c_field_list = None
+    c_id_value = None
+    c_parameters = None
 
     def __init__(self, p_kernel, p_table_name): #+++
         """ Конструктор """
@@ -65,14 +65,16 @@ class CTableGuard():
 
         try:
 
+            #c_parameters = dict()
             self.c_source_cursor = self.c_kernel.get_connection().cursor()
             #*** Получим выборку
             l_fields = ", ".join(self.c_field_list)
             l_query = self.c_source_query % l_fields
-#             print(l_query)
-            self.c_source_cursor.execute(l_query)
+            l_param = dict(p_id=self.c_id_value)
+            self.c_source_cursor.execute(l_query, l_param)
             self.c_source_data = self.c_source_cursor.fetchall()
-            print("Data: ", self.c_source_data)
+            #print("Data: ", self.c_source_data)
+            #c_parameters = None
             return True
 
         except psycopg2.Error:
@@ -107,14 +109,16 @@ class CTableGuard():
                     self.c_field_widthes[l_meta_data_row[0]] = l_meta_data_row[2]
 
     
-    def set_source_query(self, p_query): #+++
+    def set_source_query(self, p_query, p_id): #+++
         """ Задает запрос для загрузки данных в компоненты """
 
         assert p_query is not None, "Assert: [table_guard.set_source_query]: \
             No <p_query> parameter specified!"
+        assert p_id is not None, "Assert: [table_guard.set_source_query]: \
+            No <p_id> parameter specified!"
         
         self.c_source_query = p_query
-    
+        self.c_id_value = p_id
     
     def set_field_list(self, p_field_list): #++
         """ Задает список полей для выборки """
@@ -195,8 +199,8 @@ class CTableGuard():
         assert p_field_idx is not None, "Assert: [table_guard.get_field_value]: \
             No <p_field_idx> parameter specified!"
         
-        print("Field: ", p_field_idx)
-        print("Data: ",self.c_source_data)
+#         print("Field: ", p_field_idx)
+#         print("Data: ",self.c_source_data)
         return self.c_source_data[0][p_field_idx]
 
 
