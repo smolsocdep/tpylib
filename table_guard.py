@@ -7,7 +7,7 @@
 #from PyQt5 import QtCore #QtWidgets, 
 import psycopg2
 #from os.path import join
-
+from string import Template
 # from pip._vendor.pyparsing import line
 # from pylint.test.functional.undefined_variable import Self
 #, QtGui QtCore,
@@ -62,19 +62,14 @@ class CTableGuard():
 
     def __reopen_source_query(self): #+**
         """ Производит выборку данных для редактирования/добавления """
-
+        
+        # print("CTableGuard:__reopen_source_query")
         try:
 
-# from string import Template
-# t = Template('Hey, $name!')
-#
-# print(t.substitute(name=name))
-            #c_parameters = dict()
             self.c_source_cursor = self.c_kernel.get_connection().cursor()
             #*** Получим выборку
             l_fields = ", ".join(self.c_field_list)
-            #l_query = self.c_source_query % l_fields
-            l_query = self.c_source_query.substitute(l_fields)
+            l_query = self.c_source_query.format(l_fields)
             l_param = dict(p_id=self.c_id_value)
             self.c_source_cursor.execute(l_query, l_param)
             self.c_source_data = self.c_source_cursor.fetchall()
@@ -90,6 +85,8 @@ class CTableGuard():
 
         assert self.c_field_list is not None, "Assert: [table_guard.__query_metadata]: \
             No field list was defined in CTableGuard!"
+        
+        # print("CTableGuard:__query_metadata")
 
         #*** Получим курсор
         l_meta_cursor = self.c_kernel.get_connection().cursor()
