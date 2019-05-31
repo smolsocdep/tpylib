@@ -15,7 +15,7 @@ import psycopg2
 
 SQL_QUERY_COLUMNS_INFO = "select column_name, data_type, character_maximum_length \
                           from information_schema.columns \
-                          where table_schema = 'public' and table_name='%s'"
+                          where table_schema = 'public' and table_name=%(p_table_name)s"
 
 FIELD_NAME_ORDER = 0
 FIELD_TYPE_ORDER = 1
@@ -65,23 +65,26 @@ class CTableGuard():
 
         try:
 
+# from string import Template
+# t = Template('Hey, $name!')
+#
+# print(t.substitute(name=name))
             #c_parameters = dict()
             self.c_source_cursor = self.c_kernel.get_connection().cursor()
             #*** Получим выборку
             l_fields = ", ".join(self.c_field_list)
-            l_query = self.c_source_query % l_fields
+            #l_query = self.c_source_query % l_fields
+            l_query = self.c_source_query.substitute(l_fields)
             l_param = dict(p_id=self.c_id_value)
             self.c_source_cursor.execute(l_query, l_param)
             self.c_source_data = self.c_source_cursor.fetchall()
-            #print("Data: ", self.c_source_data)
-            #c_parameters = None
             return True
 
         except psycopg2.Error:
 
             return False
 
-
+    
     def __query_metadata(self): #+**
         """ Получает данные о полях заданной таблицы """
 
@@ -91,13 +94,12 @@ class CTableGuard():
         #*** Получим курсор
         l_meta_cursor = self.c_kernel.get_connection().cursor()
         #*** Получим выборку
-        l_sql = SQL_QUERY_COLUMNS_INFO % self.c_table_name
-        l_meta_cursor.execute(l_sql)
+        l_param = dict(p_table_name=self.c_table_name)
+        l_meta_cursor.execute(SQL_QUERY_COLUMNS_INFO, l_param)
         #*** Вытащим все данные из выборки
         l_meta_data = l_meta_cursor.fetchall()
         #*** Получим кол-во строк
         l_rows = len(l_meta_data)
-#         print("Meta: ", l_meta_data)
         #*** если выборка не пустая...
         if l_rows > 0:
             
@@ -119,7 +121,8 @@ class CTableGuard():
         
         self.c_source_query = p_query
         self.c_id_value = p_id
-    
+
+
     def set_field_list(self, p_field_list): #++
         """ Задает список полей для выборки """
 
@@ -128,7 +131,6 @@ class CTableGuard():
 
         self.c_field_list = p_field_list
         self.c_field_count = len(p_field_list)
-#         print(self.c_field_count)
 
 
     def prepare(self): #+++
@@ -139,59 +141,7 @@ class CTableGuard():
 
         #*** Откроем выборку для загрузки в контролы
         self.__reopen_source_query()
-    
-#     def get_field_index(self, p_field_name):
-#         """ Ищет заданное поле в списке имён """
-# 
-#         assert p_field_name is not None, "Assert: [table_guard.get_field_index]: \
-#             No <p_field_name> parameter specified!"
-#         print("Name: ",p_field_name)
-#         try:
-# 
-#             return self.c_field_names.index(p_field_name)
-#         except ValueError:
-# 
-#             return TG_FIELD_NOT_FOUND
-# 
-# 
-#     def get_field_length_by_index(self, p_field_index):
-#         """ Возвращает длину заданного поля по его индексу """
-#         
-#         assert p_field_index is not None, "Assert: [table_guard.get_field_length_by_index]: \
-#             No <p_field_index> parameter specified!"
-#         return self.c_field_widthes[p_field_index]
-
-
-#     def get_field_length_by_name(self, p_field_name):
-#         """ Возвращает длину заданного поля """
-# 
-#         assert p_field_name is not None, "Assert: [table_guard.get_field_length]: \
-#             No <p_field_name> parameter specified!"
-#         l_field_idx = self.get_field_index(p_field_name)
-#         if l_field_idx == TG_FIELD_NOT_FOUND:
-# 
-#             return None
-#         return self.c_field_widthes[l_field_idx]
-
-#     def get_field_content_by_index(self, p_field_index):
-#         """ Возвращает длину заданного поля по его индексу """
-#         
-#         assert p_field_index is not None, "Assert: [table_guard.get_field_length_by_index]: \
-#             No <p_field_index> parameter specified!"
-#         print("Idx: ",p_field_index)
-#         return self.c_source_data[0][p_field_index]
-
-
-#     def get_field_data_by_number(self, p_field_number):
-#         """ Возвращает значение заданного поля """
-# 
-#         assert p_field_number is not None, "Assert: [table_guard.get_field_data_by_name]: \
-#             No <p_field_number> parameter specified!"
-#         if len(self.c_source_data)-1 > p_field_number:
-# 
-#             return self.c_source_data[p_field_number]
-#         return None
-
+  
     
     def get_field_value(self, p_field_idx):
         """ Возвращает значение поля с указанным индексом """
@@ -199,8 +149,6 @@ class CTableGuard():
         assert p_field_idx is not None, "Assert: [table_guard.get_field_value]: \
             No <p_field_idx> parameter specified!"
         
-#         print("Field: ", p_field_idx)
-#         print("Data: ",self.c_source_data)
         return self.c_source_data[0][p_field_idx]
 
 
