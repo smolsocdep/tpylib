@@ -3,20 +3,11 @@
     в qLineEdit, чтобы исключить ввод данных, которые не будут сохранены"""
 
 
-#import collections
-#from PyQt5 import QtCore #QtWidgets, 
 import psycopg2
-#from os.path import join
-from string import Template
-# from pip._vendor.pyparsing import line
-# from pylint.test.functional.undefined_variable import Self
-#, QtGui QtCore,
-
-
+#from string import Template
 SQL_QUERY_COLUMNS_INFO = "select column_name, data_type, character_maximum_length \
                           from information_schema.columns \
                           where table_schema = 'public' and table_name=%(p_table_name)s"
-
 FIELD_NAME_ORDER = 0
 FIELD_TYPE_ORDER = 1
 FIELD_WIDTH_ORDER = 2
@@ -31,9 +22,13 @@ FIELD_TYPE_VARCHAR = "character varying"
 FIELD_TYPE_INTEGER = "integer"
 FIELD_TYPE_DATE = "date"
 
+DB_MODE_INSERT = 0
+DB_MODE_UPDATE = 1
+
 class CTableGuard():
     """ Класс реализует защиту БД """
 
+    # pylint: disable=too-many-instance-attributes
     #*** Эти списки заполняются из выборки
     c_field_count = 0 #+
     c_field_types = {}
@@ -62,7 +57,7 @@ class CTableGuard():
 
     def __reopen_source_query(self): #+**
         """ Производит выборку данных для редактирования/добавления """
-        
+
         # print("CTableGuard:__reopen_source_query")
         try:
 
@@ -79,13 +74,13 @@ class CTableGuard():
 
             return False
 
-    
+
     def __query_metadata(self): #+**
         """ Получает данные о полях заданной таблицы """
 
         assert self.c_field_list is not None, "Assert: [table_guard.__query_metadata]: \
             No field list was defined in CTableGuard!"
-        
+
         # print("CTableGuard:__query_metadata")
 
         #*** Получим курсор
@@ -99,15 +94,15 @@ class CTableGuard():
         l_rows = len(l_meta_data)
         #*** если выборка не пустая...
         if l_rows > 0:
-            
+
             for l_meta_data_row in l_meta_data:
 
                 if self.c_field_list.count(l_meta_data_row[0]):
-                    
+
                     self.c_field_types[l_meta_data_row[0]] = l_meta_data_row[1]
                     self.c_field_widthes[l_meta_data_row[0]] = l_meta_data_row[2]
 
-    
+
     def set_source_query(self, p_query, p_id): #+++
         """ Задает запрос для загрузки данных в компоненты """
 
@@ -115,7 +110,7 @@ class CTableGuard():
             No <p_query> parameter specified!"
         assert p_id is not None, "Assert: [table_guard.set_source_query]: \
             No <p_id> parameter specified!"
-        
+
         self.c_source_query = p_query
         self.c_id_value = p_id
 
@@ -138,41 +133,41 @@ class CTableGuard():
 
         #*** Откроем выборку для загрузки в контролы
         self.__reopen_source_query()
-  
-    
+
+
     def get_field_value(self, p_field_idx):
         """ Возвращает значение поля с указанным индексом """
 
         assert p_field_idx is not None, "Assert: [table_guard.get_field_value]: \
             No <p_field_idx> parameter specified!"
-        
+
         return self.c_source_data[0][p_field_idx]
 
 
     def load_line_edit(self, p_line_edit, p_field_idx): #+++
-        """ Загружает данные в строку ввода и задает макс. длину """    
+        """ Загружает данные в строку ввода и задает макс. длину """
 
         assert p_line_edit is not None, "Assert: [table_guard.load_line_edit]: \
             No <p_line_edit> parameter specified!"
         assert p_field_idx is not None, "Assert: [table_guard.load_line_edit]: \
             No <p_field_idx> parameter specified!"
-        
-        #ToDo: Сделать обработку Integer'а и Float'а    
+
+        #ToDo: Сделать обработку Integer'а и Float'а
         l_field_name = self.c_field_list[p_field_idx]
         if self.c_field_types[l_field_name] == "character varying":
 
             p_line_edit.setText(self.c_source_data[0][p_field_idx])
             p_line_edit.setMaxLength(self.c_field_widthes[l_field_name])
 
-    
+
     def load_date_edit(self, p_date_edit, p_field_idx): #+++
-        """ Загружает дату в редактор дат """    
-        
+        """ Загружает дату в редактор дат """
+
         assert p_date_edit is not None, "Assert: [table_guard.load_date_edit]: \
             No <p_date_edit> parameter specified!"
         assert p_field_idx is not None, "Assert: [table_guard.load_date_edit]: \
             No <p_field_idx> parameter specified!"
-            
+
         l_field_name = self.c_field_list[p_field_idx]
         if self.c_field_types[l_field_name] == "date":
 

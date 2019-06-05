@@ -49,12 +49,10 @@ class CComboLookup():
 
         assert p_id is not None, "Assert: [combo_lookup.find_index_by_id]: \
             No <p_id> parameter specified!"
-        
+
         # print()
         for l_key in self.c_id_dict:
 
-#             print("Key: ", l_key)    
-#             print("Search: ", self.c_id_dict[l_key])    
             if self.c_id_dict[l_key] == p_id:
 
                 return l_key
@@ -68,7 +66,7 @@ class CComboLookup():
             No <p_index> parameter specified!"
 
         return self.c_id_dict[p_index]
- 
+
 
     def load_and_select(self, p_combobox, p_id):
         """Загружает данные в комбо и выбирает строку с заданным ID """
@@ -84,6 +82,3 @@ class CComboLookup():
         # print("Index: ", l_index)
         if l_index:
             p_combobox.setCurrentIndex(l_index)
-
-
-    
