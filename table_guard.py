@@ -4,7 +4,8 @@
 
 
 import psycopg2
-#from string import Template
+import datetime
+
 SQL_QUERY_COLUMNS_INFO = "select column_name, data_type, character_maximum_length \
                           from information_schema.columns \
                           where table_schema = 'public' and table_name=%(p_table_name)s"
@@ -103,16 +104,25 @@ class CTableGuard():
                     self.c_field_widthes[l_meta_data_row[0]] = l_meta_data_row[2]
 
 
-    def set_source_query(self, p_query, p_id): #+++
+    def set_query_for_update(self, p_query, p_id): #+++
         """ Задает запрос для загрузки данных в компоненты """
 
-        assert p_query is not None, "Assert: [table_guard.set_source_query]: \
+        assert p_query is not None, "Assert: [table_guard.set_query_for_update]: \
             No <p_query> parameter specified!"
-        assert p_id is not None, "Assert: [table_guard.set_source_query]: \
+        assert p_id is not None, "Assert: [table_guard.set_query_for_update]: \
             No <p_id> parameter specified!"
 
         self.c_source_query = p_query
         self.c_id_value = p_id
+
+
+    def set_query_for_insert(self, p_query):
+        """ Задает запрос для инициализации компонентов без загрузки данных """
+
+        assert p_query is not None, "Assert: [table_guard.set_query_for_insert]: \
+            No <p_query> parameter specified!"
+
+        self.c_source_query = p_query
 
 
     def set_field_list(self, p_field_list): #++
@@ -172,3 +182,29 @@ class CTableGuard():
         if self.c_field_types[l_field_name] == "date":
 
             p_date_edit.setDate(self.c_source_data[0][p_field_idx])
+
+
+    def init_line_edit(self, p_line_edit, p_field_idx):
+        """ Очищает контрол и задает макс. длину """
+
+        assert p_line_edit is not None, "Assert: [table_guard.init_line_edit]: \
+            No <p_line_edit> parameter specified!"
+        assert p_field_idx is not None, "Assert: [table_guard.init_line_edit]: \
+            No <p_field_idx> parameter specified!"
+
+        l_field_name = self.c_field_list[p_field_idx]
+        if self.c_field_types[l_field_name] == "character varying":
+
+            p_line_edit.setText("")
+            p_line_edit.setMaxLength(self.c_field_widthes[l_field_name])
+
+
+    def init_date_edit(self, p_date_edit): #+++
+        """ Задает текущую дату редактору дат """
+
+        assert p_date_edit is not None, "Assert: [table_guard.init_date_edit]: \
+            No <p_date_edit> parameter specified!"
+        assert p_field_idx is not None, "Assert: [table_guard.init_date_edit]: \
+            No <p_field_idx> parameter specified!"
+
+        p_date_edit.setDate(datetime.datetime.now())

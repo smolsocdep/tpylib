@@ -42,6 +42,7 @@ class CComboLookup():
 
                 p_combobox.addItem(l_row[1])
                 self.c_id_dict[p_combobox.count()-1] = l_row[0]
+                p_combobox.setCurrentIndex(0)
 
 
     def find_index_by_id(self, p_id):
