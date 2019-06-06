@@ -204,7 +204,5 @@ class CTableGuard():
 
         assert p_date_edit is not None, "Assert: [table_guard.init_date_edit]: \
             No <p_date_edit> parameter specified!"
-        assert p_field_idx is not None, "Assert: [table_guard.init_date_edit]: \
-            No <p_field_idx> parameter specified!"
 
         p_date_edit.setDate(datetime.datetime.now())
