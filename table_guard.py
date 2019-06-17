@@ -3,8 +3,8 @@
     в qLineEdit, чтобы исключить ввод данных, которые не будут сохранены"""
 
 
-import psycopg2
 import datetime
+import psycopg2
 
 SQL_QUERY_COLUMNS_INFO = "select column_name, data_type, character_maximum_length \
                           from information_schema.columns \
@@ -198,7 +198,7 @@ class CTableGuard():
             p_line_edit.setText("")
             p_line_edit.setMaxLength(self.c_field_widthes[l_field_name])
 
-
+    #pylint: disable=no-self-use
     def init_date_edit(self, p_date_edit): #+++
         """ Задает текущую дату редактору дат """
 
