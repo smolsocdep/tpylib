@@ -5,6 +5,7 @@
 
 import datetime
 import psycopg2
+from tpylib import tdebug as deb
 
 SQL_QUERY_COLUMNS_INFO = "select column_name, data_type, character_maximum_length \
                           from information_schema.columns \
@@ -59,7 +60,7 @@ class CTableGuard():
     def __reopen_source_query(self): #+**
         """ Производит выборку данных для редактирования/добавления """
 
-        # print("CTableGuard:__reopen_source_query")
+        deb.dout("CTableGuard", "__reopen_source_query")
         try:
 
             self.c_source_cursor = self.c_kernel.get_connection().cursor()
@@ -67,12 +68,16 @@ class CTableGuard():
             l_fields = ", ".join(self.c_field_list)
             l_query = self.c_source_query.format(l_fields)
             l_param = dict(p_id=self.c_id_value)
+            deb.dout("CTableGuard", "__reopen_source_query", l_query)
+            deb.dout("CTableGuard", "__reopen_source_query", l_param)
             self.c_source_cursor.execute(l_query, l_param)
             self.c_source_data = self.c_source_cursor.fetchall()
+            deb.dout("CTableGuard", "__reopen_source_query", self.c_source_data)
             return True
 
         except psycopg2.Error:
 
+            deb.dout("CTableGuard", "__reopen_source_query", "Query failed")
             return False
 
 
