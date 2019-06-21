@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 import configparser
 import constants as cns
 import os
-
+from tpylib import tdebug as deb
 
 def load_form_pos_and_size(p_kernel, p_form):
         """ Читает положение и размеры формы из ini-файла """
@@ -83,12 +83,13 @@ def save_table_widget(p_kernel, p_widget):
     l_config = configparser.ConfigParser()
     l_config[cns.TABLE_SECTION] = {}
     l_config[cns.TABLE_SECTION]["count"] = str(p_widget.columnCount())
-    for l_col_number in range p_widget.columnCount():
-        l_config[cns.TABLE_SECTION][l_col_number] = str(p_widget.columnWidth(l_col_number))
+    for l_col_number in range(p_widget.columnCount()):
+        l_config[cns.TABLE_SECTION][str(l_col_number)] = str(p_widget.columnWidth(l_col_number))
     l_config[cns.TABLE_SECTION]["fontsize"] = str(p_widget.font().pointSize())
     with open(l_folder+p_widget.objectName()+".ini", "w") as l_ini_file:
 
             l_config.write(l_ini_file)
+
 
 def load_table_widget(p_kernel, p_widget):
     """ Восстанавливает настройки QtTableWidget """
@@ -106,16 +107,21 @@ def load_table_widget(p_kernel, p_widget):
     #*** Заполним словарь
     l_config = configparser.ConfigParser()
     l_config.read(l_folder)
+    #deb.dout(p_widget.columnCount())
 
-    for l_col_number in range p_widget.columnCount():
+    for l_col_number in range(p_widget.columnCount()):
 
-        if l_config[cns.TABLE_SECTION][l_col_number]:
+        #deb.dout(l_col_number, l_config[cns.TABLE_SECTION][l_col_number])
+        if l_config[cns.TABLE_SECTION][str(l_col_number)]:
 
-            l_width = l_config[cns.TABLE_SECTION][l_col_number]
-            p_widget.setColumnWidth(l_width)
+            l_width = l_config[cns.TABLE_SECTION][str(l_col_number)]
+            p_widget.setColumnWidth(l_col_number, int(l_width))
+            deb.dout(l_col_number, l_width)
 
+    """
     if l_config[cns.TABLE_SECTION]["fontsize"]:
 
         l_font = p_widget.font()
         l_font.setPointSize(int(l_config[cns.TABLE_SECTION]["fontsize"]))
         p_widget.setFont(l_font)
+    """
