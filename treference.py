@@ -17,7 +17,7 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_MainWindow):
     def __init__(self, p_kernel):
         """ Constructor """
 
-        assert p_kernel is not None, "Assert: [combo_lookup.__init__]:
+        assert p_kernel is not None, "Assert: [combo_lookup.__init__]: \
             No <p_kernel> parameter specified!"
 
         # assert p_query is not None, "Assert: [combo_lookup.__init__]: \
