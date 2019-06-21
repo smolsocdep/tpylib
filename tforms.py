@@ -6,6 +6,18 @@ import configparser
 import constants as cns
 from tpylib import tdebug as deb
 
+def get_etc_folder(p_kernel):
+    """ Возвращает строку с путём к каталогу etc """
+
+    assert p_kernel is not None, "Assert: [tforms.get_etc_folder]: \
+        No <p_kernel> parameter specified!"
+
+    l_folder = p_kernel.get_settings()[cns.PRG_PROGRAM_FOLDER_KEY]
+    l_folder += cns.ETC_FOLDER
+    if not os.path.exists(l_folder):
+        os.mkdir(l_folder)
+    return l_folder
+
 
 def load_form_pos_and_size(p_kernel, p_form):
     """ Читает положение и размеры формы из ini-файла """
@@ -15,10 +27,8 @@ def load_form_pos_and_size(p_kernel, p_form):
     assert p_form is not None, "Assert: [tforms.load_form_pos_and_size]: \
         No <p_form> parameter specified!"
 
-    #*** Определим, где лежит Ini-шка с параметрами формы
-    l_folder = p_kernel.get_settings()[cns.PRG_PROGRAM_FOLDER_KEY]
-    l_folder += cns.ETC_FOLDER
-    if os.path.exists(l_folder):
+    l_folder = get_etc_folder(p_kernel)
+    if l_folder:
 
         #*** Прочитаем словарь из ini-шки
         l_folder += p_form.objectName() + ".ini"
@@ -26,6 +36,7 @@ def load_form_pos_and_size(p_kernel, p_form):
         l_config.read(l_folder)
         #*** Прочитаем параметры формы из словаря
         try:
+
             #*** Выставим положение формы
             l_top = l_config[cns.FORM_SECTION]["top"]
             l_left = l_config[cns.FORM_SECTION]["left"]
@@ -41,6 +52,30 @@ def load_form_pos_and_size(p_kernel, p_form):
             pass
 
 
+def load_table_widget(p_kernel, p_widget):
+    """ Восстанавливает настройки QtTableWidget """
+
+    assert p_kernel is not None, "Assert: [tforms.save_table_widget]: \
+        No <p_kernel> parameter specified!"
+    assert p_widget is not None, "Assert: [tforms.save_table_widget]: \
+        No <p_widget> parameter specified!"
+
+    l_folder = get_etc_folder(p_kernel)
+    #*** Заполним словарь
+    l_config = configparser.ConfigParser()
+    l_config.read(l_folder)
+    #deb.dout(p_widget.columnCount())
+
+    for l_col_number in range(p_widget.columnCount()):
+
+        #deb.dout(l_col_number, l_config[cns.TABLE_SECTION][l_col_number])
+        if l_config[cns.TABLE_SECTION][str(l_col_number)]:
+
+            l_width = l_config[cns.TABLE_SECTION][str(l_col_number)]
+            p_widget.setColumnWidth(l_col_number, int(l_width))
+            deb.dout(l_col_number, l_width)
+
+
 def save_form_pos_and_size(p_kernel, p_form):
     """ Сохраняет положение и размеры формы в ini-файл """
 
@@ -49,11 +84,7 @@ def save_form_pos_and_size(p_kernel, p_form):
     assert p_form is not None, "Assert: [tforms.save_form_pos_and_size]: \
         No <p_form> parameter specified!"
 
-    #*** Определим, куда нужно сохранять Ini-шку
-    l_folder = p_kernel.get_settings()[cns.PRG_PROGRAM_FOLDER_KEY]
-    l_folder += cns.ETC_FOLDER
-    if not os.path.exists(l_folder):
-        os.mkdir(l_folder)
+    l_folder = get_etc_folder(p_kernel)
     #*** Заполним словарь
     l_config = configparser.ConfigParser()
     l_config[cns.FORM_SECTION] = {}
@@ -75,11 +106,8 @@ def save_table_widget(p_kernel, p_widget):
     assert p_widget is not None, "Assert: [tforms.save_table_widget]: \
         No <p_widget> parameter specified!"
 
-    #*** Определим, куда нужно сохранять Ini-шку
-    l_folder = p_kernel.get_settings()[cns.PRG_PROGRAM_FOLDER_KEY]
-    l_folder += cns.ETC_FOLDER
-    if not os.path.exists(l_folder):
-        os.mkdir(l_folder)
+    l_folder = get_etc_folder(p_kernel)
+
     #*** Заполним словарь
     l_config = configparser.ConfigParser()
     l_config[cns.TABLE_SECTION] = {}
@@ -90,31 +118,3 @@ def save_table_widget(p_kernel, p_widget):
     with open(l_folder+p_widget.objectName()+".ini", "w") as l_ini_file:
 
         l_config.write(l_ini_file)
-
-
-def load_table_widget(p_kernel, p_widget):
-    """ Восстанавливает настройки QtTableWidget """
-
-    assert p_kernel is not None, "Assert: [tforms.save_table_widget]: \
-        No <p_kernel> parameter specified!"
-    assert p_widget is not None, "Assert: [tforms.save_table_widget]: \
-        No <p_widget> parameter specified!"
-
-    #*** Определим, куда нужно сохранять Ini-шку
-    l_folder = p_kernel.get_settings()[cns.PRG_PROGRAM_FOLDER_KEY]
-    l_folder += cns.ETC_FOLDER
-    if os.path.exists(l_folder):
-        l_folder += p_widget.objectName() + ".ini"
-    #*** Заполним словарь
-    l_config = configparser.ConfigParser()
-    l_config.read(l_folder)
-    #deb.dout(p_widget.columnCount())
-
-    for l_col_number in range(p_widget.columnCount()):
-
-        #deb.dout(l_col_number, l_config[cns.TABLE_SECTION][l_col_number])
-        if l_config[cns.TABLE_SECTION][str(l_col_number)]:
-
-            l_width = l_config[cns.TABLE_SECTION][str(l_col_number)]
-            p_widget.setColumnWidth(l_col_number, int(l_width))
-            deb.dout(l_col_number, l_width)
