@@ -6,6 +6,31 @@ import configparser
 import constants as cns
 from tpylib import tdebug as deb
 
+
+def calculate_table_columns_width(p_widget):
+    """ Устанавливает ширину столбцов таблицы в зависимости от содержимого """
+
+    assert p_widget is not None, "Assert: [tforms.calculate_table_columns_width]: \
+        No <p_widget> parameter specified!"
+    l_widthes = get_table_cells_value_lengths(p_widget)
+
+
+def get_table_cells_value_lengths(p_widget):
+    """ Возвращает список длин содержимого ячеек текущей строки """
+
+    assert p_widget is not None, "Assert: [tforms.get_table_cells_value_lengths]: \
+        No <p_widget> parameter specified!"
+
+    l_row = p_widget.currentRow()
+    l_widthes = dict()
+    for l_column in range(p_widget.columnCount()):
+        # l_item = p_widget.item(l_row, l_column)
+        # l_data = str(l_item.text())
+        # l_widthes[l_column] = len(l_data)
+        l_widthes[l_column] = len(str(p_widget.item(l_row, l_column)))
+    return l_widthes
+
+
 def get_etc_folder(p_kernel):
     """ Возвращает строку с путём к каталогу etc """
 
