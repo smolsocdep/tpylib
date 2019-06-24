@@ -1,6 +1,6 @@
 """ Класс универсального справочника """
 
-from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5 import QtWidgets #, QtGui, QtCore, 
 import form_reference
 
 class CReference(QtWidgets.QMainWindow, form_reference.Ui_MainWindow):

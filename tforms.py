@@ -1,8 +1,8 @@
 """ Данный модуль содержит процедуры, необходимые для создания окон с таблицами """
 
-#from PyQt5 import QtGui #QtCore, QtWidgets,
 import os
 import configparser
+from PyQt5 import QtWidgets #QtGui #QtCore,
 import constants as cns
 from tpylib import tdebug as deb
 
@@ -13,6 +13,14 @@ def calculate_table_columns_width(p_widget):
     assert p_widget is not None, "Assert: [tforms.calculate_table_columns_width]: \
         No <p_widget> parameter specified!"
     l_widthes = get_table_cells_value_lengths(p_widget)
+    l_sum_width = 0
+    for l_column in range(p_widget.columnCount()):
+        l_sum_width += l_widthes[l_column]
+    l_width_percent = l_sum_width / 100
+    l_real_widthes = dict()
+    for l_column in range(p_widget.columnCount()):
+        l_real_widthes[l_column] = p_widget.width() / l_width_percent
+
 
 
 def get_table_cells_value_lengths(p_widget):
@@ -85,20 +93,52 @@ def load_table_widget(p_kernel, p_widget):
     assert p_widget is not None, "Assert: [tforms.save_table_widget]: \
         No <p_widget> parameter specified!"
 
-    l_folder = get_etc_folder(p_kernel)
+    l_folder = get_etc_folder(p_kernel) + p_widget.objectName() + ".ini"
+    # deb.dout(l_folder)
     #*** Заполним словарь
     l_config = configparser.ConfigParser()
     l_config.read(l_folder)
-    #deb.dout(p_widget.columnCount())
+    # deb.dout(l_config)
 
     for l_col_number in range(p_widget.columnCount()):
 
-        #deb.dout(l_col_number, l_config[cns.TABLE_SECTION][l_col_number])
+        # deb.dout(l_col_number, cns.TABLE_SECTION)
         if l_config[cns.TABLE_SECTION][str(l_col_number)]:
 
             l_width = l_config[cns.TABLE_SECTION][str(l_col_number)]
             p_widget.setColumnWidth(l_col_number, int(l_width))
             deb.dout(l_col_number, l_width)
+
+
+def pre_tweak_table(p_widget, p_rows, p_columns, p_hide_columns, p_headers):
+    """ Производит настройки таблицы """
+
+    assert p_widget is not None, "Assert: [tforms.pre_tweak_table]: \
+        No <p_widget> parameter specified!"
+    assert p_columns is not None, "Assert: [tforms.pre_tweak_table]: \
+        No <p_columns> parameter specified!"
+    assert p_rows is not None, "Assert: [tforms.pre_tweak_table]: \
+        No <p_rows> parameter specified!"
+    assert p_hide_columns is not None, "Assert: [tforms.pre_tweak_table]: \
+        No <p_hide_columns> parameter specified!"
+    assert p_headers is not None, "Assert: [tforms.pre_tweak_table]: \
+        No <p_headers> parameter specified!"
+
+    #*** Чистим таблицу
+    p_widget.clear()
+    #*** К-во столбцов
+    p_widget.setColumnCount(p_columns)
+    #*** К-во строк
+    p_widget.setRowCount(p_rows)
+    #*** прячем столбцы
+    for l_column in p_hide_columns:
+        p_widget.hideColumn(l_column)
+    #*** Задаем наименования столбцов
+    p_widget.setHorizontalHeaderLabels(p_headers)
+    #*** Запретим прямое редактирование таблицы
+    p_widget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+    #*** Запрещаем сортировку для избежания глюков
+    p_widget.setSortingEnabled(False)
 
 
 def save_form_pos_and_size(p_kernel, p_form):
