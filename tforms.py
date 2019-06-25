@@ -7,19 +7,41 @@ import constants as cns
 from tpylib import tdebug as deb
 
 
-def calculate_table_columns_width(p_widget):
+def calculate_table_columns_width(p_widget, p_hidden_columns):
     """ Устанавливает ширину столбцов таблицы в зависимости от содержимого """
 
     assert p_widget is not None, "Assert: [tforms.calculate_table_columns_width]: \
         No <p_widget> parameter specified!"
     l_widthes = get_table_cells_value_lengths(p_widget)
+    deb.dout("R0:", l_widthes)
+
+    ## ToDo: Надо как-то отлавливать столбцы шириной <32
+    l_table_width = p_widget.width()-22
+    l_table_width_percent = (l_table_width) / 100
+
     l_sum_width = 0
     for l_column in range(p_widget.columnCount()):
-        l_sum_width += l_widthes[l_column]
+
+        if l_column not in p_hidden_columns:
+            l_sum_width += l_widthes[l_column]
     l_width_percent = l_sum_width / 100
-    l_real_widthes = dict()
+    deb.dout("R1:", p_widget.width())
+
+    l_coefficients = dict()
     for l_column in range(p_widget.columnCount()):
-        l_real_widthes[l_column] = p_widget.width() / l_width_percent
+
+        if l_column not in p_hidden_columns:
+
+            # вот тут проверять
+            l_coefficients[l_column] = l_widthes[l_column] / l_width_percent
+            deb.dout("R2:", l_column, l_coefficients[l_column])
+
+    deb.dout("R3:", p_widget.width(), l_table_width_percent)
+    for l_column in range(p_widget.columnCount()):
+
+        if l_column not in p_hidden_columns:
+            p_widget.setColumnWidth(l_column, int(l_table_width_percent * l_coefficients[l_column]))
+            deb.dout("R4:", l_column, int(l_table_width_percent * l_coefficients[l_column]))
     #чего-то посомтреть в свойствах таблицы
 
 def colorize_item(p_colors, p_data, p_row, p_color_column, p_item):
@@ -83,10 +105,8 @@ def get_table_cells_value_lengths(p_widget):
     l_row = p_widget.currentRow()
     l_widthes = dict()
     for l_column in range(p_widget.columnCount()):
-        # l_item = p_widget.item(l_row, l_column)
-        # l_data = str(l_item.text())
-        # l_widthes[l_column] = len(l_data)
-        l_widthes[l_column] = len(str(p_widget.item(l_row, l_column)))
+        l_len = len(str(p_widget.item(l_row, l_column).text()))
+        l_widthes[l_column] = l_len
     return l_widthes
 
 
@@ -158,7 +178,7 @@ def load_table_widget(p_kernel, p_widget):
 
             l_width = l_config[cns.TABLE_SECTION][str(l_col_number)]
             p_widget.setColumnWidth(l_col_number, int(l_width))
-            deb.dout(l_col_number, l_width)
+            # deb.dout(l_col_number, l_width)
 
 
 def pre_tweak_table(p_widget, p_rows, p_columns, p_hide_columns, p_headers):
@@ -230,6 +250,7 @@ def save_table_widget(p_kernel, p_widget):
     l_config[cns.TABLE_SECTION]["count"] = str(p_widget.columnCount())
     for l_col_number in range(p_widget.columnCount()):
         l_config[cns.TABLE_SECTION][str(l_col_number)] = str(p_widget.columnWidth(l_col_number))
+        deb.dout(l_col_number, p_widget.columnWidth(l_col_number))
     l_config[cns.TABLE_SECTION]["fontsize"] = str(p_widget.font().pointSize())
     with open(l_folder+p_widget.objectName()+".ini", "w") as l_ini_file:
 
