@@ -40,7 +40,10 @@ def calculate_table_columns_width(p_widget, p_hidden_columns):
     for l_column in range(p_widget.columnCount()):
 
         if l_column not in p_hidden_columns:
-            p_widget.setColumnWidth(l_column, int(l_table_width_percent * l_coefficients[l_column]))
+
+            l_column_width = int(l_table_width_percent * l_coefficients[l_column])
+            # if l_column_width < 32:
+            p_widget.setColumnWidth(l_column, l_column_width)
             deb.dout("R4:", l_column, int(l_table_width_percent * l_coefficients[l_column]))
     #чего-то посомтреть в свойствах таблицы
 
