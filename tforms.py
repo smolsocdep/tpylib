@@ -26,7 +26,8 @@ def calculate_table_columns_width(p_widget, p_hidden_columns):
             l_sum_width += l_widthes[l_column]
     l_width_percent = l_sum_width / 100
     deb.dout("R1:", p_widget.width())
-
+    ## Todo: Вынести расчет суммарной ширины содержимого в отдельную процедуру
+    #columnwidth=(32/(tabwidth/100))*(summwidth/100)
     l_coefficients = dict()
     for l_column in range(p_widget.columnCount()):
 
