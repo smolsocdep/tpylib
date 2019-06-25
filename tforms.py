@@ -2,7 +2,7 @@
 
 import os
 import configparser
-from PyQt5 import QtWidgets #QtGui #QtCore,
+from PyQt5 import QtWidgets, QtCore, QtGui
 import constants as cns
 from tpylib import tdebug as deb
 
@@ -20,7 +20,58 @@ def calculate_table_columns_width(p_widget):
     l_real_widthes = dict()
     for l_column in range(p_widget.columnCount()):
         l_real_widthes[l_column] = p_widget.width() / l_width_percent
+    #чего-то посомтреть в свойствах таблицы
 
+def colorize_item(p_colors, p_data, p_row, p_color_column, p_item):
+    """ Раскрашивает элемент таблицы """
+
+    assert p_colors is not None, "Assert: [tforms.colorize_item]: \
+        No <p_colors> parameter specified!"
+    assert p_data is not None, "Assert: [tforms.colorize_item]: \
+        No <p_data> parameter specified!"
+    assert p_row is not None, "Assert: [tforms.colorize_item]: \
+        No <p_row> parameter specified!"
+    assert p_color_column is not None, "Assert: [tforms.colorize_item]: \
+        No <p_color_column> parameter specified!"
+    assert p_item is not None, "Assert: [tforms.colorize_item]: \
+        No <p_item> parameter specified!"
+
+    l_color_index = p_data[p_row][p_color_column]
+    l_color = p_colors[l_color_index-1]
+    p_item.setBackground(QtGui.QBrush(l_color))
+
+
+def fill_table_with_data(p_widget, p_data, p_aligns, p_color_column, p_colors):
+    """ Заполняет таблицу данными """
+
+    assert p_widget is not None, "Assert: [tforms.fill_table_with_data]: \
+        No <p_widget> parameter specified!"
+    assert p_data is not None, "Assert: [tforms.fill_table_with_data]: \
+        No <p_data> parameter specified!"
+    assert p_aligns is not None, "Assert: [tforms.fill_table_with_data]: \
+        No <p_aligns> parameter specified!"
+    assert p_color_column is not None, "Assert: [tforms.fill_table_with_data]: \
+        No <p_color_column parameter specified!"
+    assert p_colors is not None, "Assert: [tforms.fill_table_with_data]: \
+        No <p_colors> parameter specified!"
+
+    ## To Do: получть из табль p_rows, p_cols
+    #*** перебираем строки
+    for l_row in range(p_widget.rowCount()):
+
+        #*** перебираем столбцы
+        for l_column in range(p_widget.columnCount()):
+
+            #*** создаем элемент таблицы и инициализируем его данными
+            l_text = str(p_data[l_row][l_column])
+            l_item = QtWidgets.QTableWidgetItem(l_text)
+            l_item.setTextAlignment(p_aligns[l_column] | QtCore.Qt.AlignVCenter)
+            #*** Добавляем новый элемент в таблицу
+            p_widget.setItem(l_row, l_column, l_item)
+
+            #*** Раскрашиваем строку
+            colorize_item(p_colors, p_data, l_row, p_color_column, l_item)
+    p_widget.setCurrentCell(0, 0)
 
 
 def get_table_cells_value_lengths(p_widget):
