@@ -7,46 +7,86 @@ import constants as cns
 from tpylib import tdebug as deb
 
 
+def calculate_summary_width_of_content(p_widthes, p_columns, p_hidden_columns):
+    """ Вычисляет суммарную длину списка """
+    assert p_widthes is not None, "Assert: [tforms.calculate_summary_width_of_content]: \
+        No <p_widthes> parameter specified!"
+    assert p_columns is not None, "Assert: [tforms.calculate_summary_width_of_content]: \
+        No <p_columns> parameter specified!"
+    assert p_hidden_columns is not None, "Assert: [tforms.calculate_summary_width_of_content]: \
+        No <p_hidden_columns> parameter specified!"
+
+    l_sum_width = 0
+    for l_column in range(p_columns):
+
+        if l_column not in p_hidden_columns:
+            l_sum_width += p_widthes[l_column]
+    return l_sum_width
+
+
 def calculate_table_columns_width(p_widget, p_hidden_columns):
     """ Устанавливает ширину столбцов таблицы в зависимости от содержимого """
 
     assert p_widget is not None, "Assert: [tforms.calculate_table_columns_width]: \
         No <p_widget> parameter specified!"
+    assert p_hidden_columns is not None, "Assert: [tforms.calculate_table_columns_width]: \
+        No <p_hidden_columns> parameter specified!"
+
+    #*** Получим длины содержимого столбцов
     l_widthes = get_table_cells_value_lengths(p_widget)
-    deb.dout("R0:", l_widthes)
+    deb.dout("ctcw_vw:", l_widthes)
 
-    ## ToDo: Надо как-то отлавливать столбцы шириной <32
-    l_table_width = p_widget.width()-22
+    #*** Рассчитаем процент ширины таблицы
+    l_table_width = p_widget.width()# так надо!
+    l_table_width -= (l_table_width/100)*6
     l_table_width_percent = (l_table_width) / 100
+    deb.dout("ctcw_twp:", l_table_width_percent)
 
-    l_sum_width = 0
+    #*** Получим общую длину содержимого столбцов и рассчит. процент
+    ## To do: Вынести расчет суммарной ширины содержимого в отдельную процедуру
+    l_sum_width = calculate_summary_width_of_content(l_widthes, p_widget.columnCount(), \
+        p_hidden_columns)
+    l_sum_width_percent = l_sum_width / 100
+    deb.dout("ctcw_swp:", l_sum_width_percent)
+
+    #*** Нет ли у нас столбцов, которые будут короче 32 пикселей?
+    #columnwidth=(32/(tabwidth/100))*(summwidth/100)
+    l_minimal_width = int((32/l_table_width_percent)*l_sum_width_percent) + 1
+    l_recalc_flag = False
+    deb.dout("ctcw_min: ", l_minimal_width)
     for l_column in range(p_widget.columnCount()):
 
         if l_column not in p_hidden_columns:
-            l_sum_width += l_widthes[l_column]
-    l_width_percent = l_sum_width / 100
-    deb.dout("R1:", p_widget.width())
-    ## Todo: Вынести расчет суммарной ширины содержимого в отдельную процедуру
-    #columnwidth=(32/(tabwidth/100))*(summwidth/100)
+
+            if l_widthes[l_column] < l_minimal_width:
+
+                l_widthes[l_column] = l_minimal_width
+                l_recalc_flag = True
+
+    #*** Пересчет нужен?
+    if l_recalc_flag:
+        l_sum_width = calculate_summary_width_of_content(l_widthes, \
+            p_widget.columnCount(), p_hidden_columns)
+        l_sum_width_percent = l_sum_width / 100
+
+    #*** Рассчитаем коэффициенты для каждого столбца
     l_coefficients = dict()
     for l_column in range(p_widget.columnCount()):
 
         if l_column not in p_hidden_columns:
 
-            # вот тут проверять
-            l_coefficients[l_column] = l_widthes[l_column] / l_width_percent
-            deb.dout("R2:", l_column, l_coefficients[l_column])
+            l_coefficients[l_column] = l_widthes[l_column] / l_sum_width_percent
+            deb.dout("ctcw_coe:", l_column, l_coefficients[l_column])
 
-    deb.dout("R3:", p_widget.width(), l_table_width_percent)
+    deb.dout("ctcw_ww:", p_widget.width(), l_table_width_percent)
+    #*** Рассчитываем и выставляем ширины столбцов
     for l_column in range(p_widget.columnCount()):
 
         if l_column not in p_hidden_columns:
 
             l_column_width = int(l_table_width_percent * l_coefficients[l_column])
-            # if l_column_width < 32:
             p_widget.setColumnWidth(l_column, l_column_width)
-            deb.dout("R4:", l_column, int(l_table_width_percent * l_coefficients[l_column]))
-    #чего-то посомтреть в свойствах таблицы
+            deb.dout("ctcw_cw:", l_column, int(l_table_width_percent * l_coefficients[l_column]))
 
 def colorize_item(p_colors, p_data, p_row, p_color_column, p_item):
     """ Раскрашивает элемент таблицы """
