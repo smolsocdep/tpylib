@@ -34,26 +34,22 @@ def calculate_table_columns_width(p_widget, p_hidden_columns):
 
     #*** Получим длины содержимого столбцов
     l_widthes = get_table_cells_value_lengths(p_widget)
-    deb.dout("ctcw_vw:", l_widthes)
 
     #*** Рассчитаем процент ширины таблицы
     l_table_width = p_widget.width()# так надо!
     l_table_width -= (l_table_width/100)*6
     l_table_width_percent = (l_table_width) / 100
-    deb.dout("ctcw_twp:", l_table_width_percent)
 
     #*** Получим общую длину содержимого столбцов и рассчит. процент
     ## To do: Вынести расчет суммарной ширины содержимого в отдельную процедуру
     l_sum_width = calculate_summary_width_of_content(l_widthes, p_widget.columnCount(), \
         p_hidden_columns)
     l_sum_width_percent = l_sum_width / 100
-    deb.dout("ctcw_swp:", l_sum_width_percent)
 
     #*** Нет ли у нас столбцов, которые будут короче 32 пикселей?
     #columnwidth=(32/(tabwidth/100))*(summwidth/100)
     l_minimal_width = int((32/l_table_width_percent)*l_sum_width_percent) + 1
     l_recalc_flag = False
-    deb.dout("ctcw_min: ", l_minimal_width)
     for l_column in range(p_widget.columnCount()):
 
         if l_column not in p_hidden_columns:
@@ -76,9 +72,7 @@ def calculate_table_columns_width(p_widget, p_hidden_columns):
         if l_column not in p_hidden_columns:
 
             l_coefficients[l_column] = l_widthes[l_column] / l_sum_width_percent
-            deb.dout("ctcw_coe:", l_column, l_coefficients[l_column])
 
-    deb.dout("ctcw_ww:", p_widget.width(), l_table_width_percent)
     #*** Рассчитываем и выставляем ширины столбцов
     for l_column in range(p_widget.columnCount()):
 
@@ -86,7 +80,6 @@ def calculate_table_columns_width(p_widget, p_hidden_columns):
 
             l_column_width = int(l_table_width_percent * l_coefficients[l_column])
             p_widget.setColumnWidth(l_column, l_column_width)
-            deb.dout("ctcw_cw:", l_column, int(l_table_width_percent * l_coefficients[l_column]))
 
 def colorize_item(p_colors, p_data, p_row, p_color_column, p_item):
     """ Раскрашивает элемент таблицы """
@@ -209,20 +202,16 @@ def load_table_widget(p_kernel, p_widget):
         No <p_widget> parameter specified!"
 
     l_folder = get_etc_folder(p_kernel) + p_widget.objectName() + ".ini"
-    # deb.dout(l_folder)
     #*** Заполним словарь
     l_config = configparser.ConfigParser()
     l_config.read(l_folder)
-    # deb.dout(l_config)
 
     for l_col_number in range(p_widget.columnCount()):
 
-        # deb.dout(l_col_number, cns.TABLE_SECTION)
         if l_config[cns.TABLE_SECTION][str(l_col_number)]:
 
             l_width = l_config[cns.TABLE_SECTION][str(l_col_number)]
             p_widget.setColumnWidth(l_col_number, int(l_width))
-            # deb.dout(l_col_number, l_width)
 
 
 def pre_tweak_table(p_widget, p_rows, p_columns, p_hide_columns, p_headers):
@@ -294,7 +283,6 @@ def save_table_widget(p_kernel, p_widget):
     l_config[cns.TABLE_SECTION]["count"] = str(p_widget.columnCount())
     for l_col_number in range(p_widget.columnCount()):
         l_config[cns.TABLE_SECTION][str(l_col_number)] = str(p_widget.columnWidth(l_col_number))
-        deb.dout(l_col_number, p_widget.columnWidth(l_col_number))
     l_config[cns.TABLE_SECTION]["fontsize"] = str(p_widget.font().pointSize())
     with open(l_folder+p_widget.objectName()+".ini", "w") as l_ini_file:
 
