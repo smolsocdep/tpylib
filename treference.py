@@ -1,7 +1,9 @@
 """ Класс универсального справочника """
 
-from PyQt5 import QtWidgets #, QtGui, QtCore, 
+from PyQt5 import QtWidgets, QtGui #, QtCore,
+import psycopg2
 import form_reference
+from tpylib import tmsgboxes as tmsg, tdebug as deb, tforms as frm
 
 class CReference(QtWidgets.QMainWindow, form_reference.Ui_MainWindow):
     """ Класс реализует универсальный справочник """
@@ -13,6 +15,8 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_MainWindow):
     c_delete_sql = ""
     c_check_sql = ""
     c_count_sql = ""
+    c_trash_state = 0
+    c_parameters = None
 
     def __init__(self, p_kernel):
         """ Constructor """
@@ -33,6 +37,18 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_MainWindow):
     def __add_toolbutton_clicked(self):
         """ Обработчик кнопки qAddToolButton """
         pass
+
+
+    def __build_sql(self):
+        """ Функция возвращает SQL готовый к исполнению"""
+
+        l_sql = c_select_sql
+
+
+    def __get_cursor(self):
+        """ Возвращает курсор """
+
+        return  self.c_kernel.get_connection().cursor()
 
 
     def __delete_toolbutton_clicked(self):
@@ -69,9 +85,79 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_MainWindow):
         pass
 
 
+    def __reopen_query(self, p_query_text):
+        """ Заполняет таблицу результатами выполнения запроса """
+
+        assert p_query_text is not None, "Assert: [mainform.__reopen_query]: \
+            No <p_query_text> parameter specified!"
+
+        try:
+
+            #*** Получим курсор
+            l_cursor = self.__get_cursor()
+            #*** Получим выборку
+            l_cursor.execute(p_query_text, self.c_parameters)
+            #*** Параметры больше не нужны
+            self.c_parameters = None
+            #*** Вытащим все данные из выборки
+            l_data = l_cursor.fetchall()
+            #*** Получим кол-во строк
+            l_rows = len(l_data)
+            #*** если выборка не пустая...
+            if l_rows > 0:
+
+                #*** Получим к-во столбцов
+                l_columns = len(l_data[0])
+                #*** Преднастройка таблицы
+                frm.pre_tweak_table(self.qReferenceTableWidget, l_rows, l_columns, \
+                    [ID_COL_NUMBER, CONTRACT_TYPE_ID_COL_NUMBER], TABLE_HEADERS)
+                #*** Заполняем таблицу данными
+                frm.fill_table_with_data(self.qReferenceTableWidget, l_data, MAIN_QUERY_ALIGNS, \
+                    CONTRACT_TYPE_ID_COL_NUMBER, cns.TYPE_COLORS)
+                frm.load_table_widget(self.c_kernel, self.qReferenceTableWidget)
+                #*** Выводим данные в строку статуса
+                self.c_count_label.setText("Всего договоров: "+str(l_rows))
+                #*** Пост-настройка таблицы
+                self.qReferenceTableWidget.setSortingEnabled(True)
+                self.act_change.setEnabled(True)
+                self.act_delete.setEnabled(True)
+                if self.c_program_started > 0:
+
+                    self.c_program_started = 0
+            else:
+
+                #*** Пустая выборка
+                self.qReferenceTableWidget.setRowCount(l_rows)
+                self.qReferenceTableWidget.clearContents()
+                self.act_change.setEnabled(False)
+                self.act_delete.setEnabled(False)
+        except psycopg2.Error as ex:
+
+            tmsg.error_occured("При обращении к базе данных возникла \
+                исключительная ситуация!", str(ex.pgerror))
+
+
+
     def __trash_toolbutton_clicked(self):
         """ Обработчик кнопки qTrashToolButton """
-        pass
+
+        #*** В зависимости от состояния корзины загружаем нужную иконку:
+        l_icon = QtGui.QIcon()
+        if self.c_trash_state == 0:
+
+            #*** Иконка "Закрыть корзину"
+            l_icon.addPixmap(QtGui.QPixmap(":/pixmaps/icons/user-trash-exit.png"),
+                             QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            self.c_trash_state = 1
+        else:
+
+            #*** Иконка "Открыть корзину"
+            l_icon.addPixmap(QtGui.QPixmap(":/pixmaps/icons/user-trash.png"),
+                             QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            self.c_trash_state = 0
+        #*** Выводим иконку и рестартуем выборку
+        self.qTrashToolButton.setIcon(l_icon)
+        self.__reopen_query(self.__build_sql())
 
 
     def set_check_sql(self, p_sql):

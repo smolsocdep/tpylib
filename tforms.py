@@ -1,14 +1,15 @@
 """ Данный модуль содержит процедуры, необходимые для создания окон с таблицами """
 
 import os
+import os.path
 import configparser
 from PyQt5 import QtWidgets, QtCore, QtGui
 import constants as cns
 from tpylib import tdebug as deb
 
-
 def calculate_summary_width_of_content(p_widthes, p_columns, p_hidden_columns):
     """ Вычисляет суммарную длину списка """
+
     assert p_widthes is not None, "Assert: [tforms.calculate_summary_width_of_content]: \
         No <p_widthes> parameter specified!"
     assert p_columns is not None, "Assert: [tforms.calculate_summary_width_of_content]: \
@@ -80,6 +81,7 @@ def calculate_table_columns_width(p_widget, p_hidden_columns):
 
             l_column_width = int(l_table_width_percent * l_coefficients[l_column])
             p_widget.setColumnWidth(l_column, l_column_width)
+
 
 def colorize_item(p_colors, p_data, p_row, p_color_column, p_item):
     """ Раскрашивает элемент таблицы """
@@ -202,16 +204,19 @@ def load_table_widget(p_kernel, p_widget):
         No <p_widget> parameter specified!"
 
     l_folder = get_etc_folder(p_kernel) + p_widget.objectName() + ".ini"
-    #*** Заполним словарь
-    l_config = configparser.ConfigParser()
-    l_config.read(l_folder)
+    deb.dout("load_table_widget", l_folder)
+    if os.path.exists(l_folder):
+        #*** Заполним словарь
+        l_config = configparser.ConfigParser()
+        l_config.read(l_folder)
+        #for l_item in l_config:
+        deb.dout("load_table_widget", l_config[cns.TABLE_SECTION])
+        for l_col_number in range(p_widget.columnCount()):
 
-    for l_col_number in range(p_widget.columnCount()):
+            if l_config[cns.TABLE_SECTION][str(l_col_number)]:
 
-        if l_config[cns.TABLE_SECTION][str(l_col_number)]:
-
-            l_width = l_config[cns.TABLE_SECTION][str(l_col_number)]
-            p_widget.setColumnWidth(l_col_number, int(l_width))
+                l_width = l_config[cns.TABLE_SECTION][str(l_col_number)]
+                p_widget.setColumnWidth(l_col_number, int(l_width))
 
 
 def pre_tweak_table(p_widget, p_rows, p_columns, p_hide_columns, p_headers):
@@ -262,6 +267,7 @@ def save_form_pos_and_size(p_kernel, p_form):
     l_config[cns.FORM_SECTION]["height"] = str(p_form.height())
     l_config[cns.FORM_SECTION]["width"] = str(p_form.width())
     #*** и сохраним его.
+    deb.dout("save_form_pos_and_size", l_folder+p_form.objectName()+".ini")
     with open(l_folder+p_form.objectName()+".ini", "w") as l_ini_file:
 
         l_config.write(l_ini_file)

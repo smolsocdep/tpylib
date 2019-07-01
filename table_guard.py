@@ -68,11 +68,11 @@ class CTableGuard():
             l_fields = ", ".join(self.c_field_list)
             l_query = self.c_source_query.format(l_fields)
             l_param = dict(p_id=self.c_id_value)
-            deb.dout("CTableGuard", "__reopen_source_query", l_query)
-            deb.dout("CTableGuard", "__reopen_source_query", l_param)
+            #deb.dout("CTableGuard", "__reopen_source_query", l_query)
+            #deb.dout("CTableGuard", "__reopen_source_query", l_param)
             self.c_source_cursor.execute(l_query, l_param)
             self.c_source_data = self.c_source_cursor.fetchall()
-            deb.dout("CTableGuard", "__reopen_source_query", self.c_source_data)
+            #deb.dout("CTableGuard", "__reopen_source_query", self.c_source_data)
             return True
 
         except psycopg2.Error:

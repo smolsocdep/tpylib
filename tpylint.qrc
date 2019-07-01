@@ -1,0 +1,19 @@
+<RCC>
+  <qresource prefix="pixmaps/">
+    <file>icons/gtk_apply.png</file>
+    <file>icons/gtk_cancel.png</file>
+    <file>icons/zoom-fit-best.png</file>
+    <file>icons/view-filter_off.png</file>
+    <file>icons/view-filter_on.png</file>
+    <file>icons/user-trash-exit.png</file>
+    <file>icons/list-add.png</file>
+    <file>icons/accessories-text-editor.png</file>
+    <file>icons/edit-delete.png</file>
+    <file>icons/system-log-out.png</file>
+    <file>icons/x-office-address-book.png</file>
+    <file>icons/user-trash.png</file>
+    <file>icons/user-trash-exit.png</file>
+    <file>icons/view-filter_off.png</file>
+    <file>icons/view-filter_on.png</file>
+  </qresource>
+</RCC>

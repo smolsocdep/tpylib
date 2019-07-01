@@ -127,11 +127,11 @@ class Ui_qReferenceMainWindow(object):
         self.horizontalLayout.addWidget(self.qRejectToolButton)
         self.horizontalLayout_2.addLayout(self.horizontalLayout)
         self.verticalLayout.addWidget(self.frame_2)
-        self.tableWidget = QtWidgets.QTableWidget(self.centralwidget)
-        self.tableWidget.setObjectName("tableWidget")
-        self.tableWidget.setColumnCount(0)
-        self.tableWidget.setRowCount(0)
-        self.verticalLayout.addWidget(self.tableWidget)
+        self.qReferenceTableWidget = QtWidgets.QTableWidget(self.centralwidget)
+        self.qReferenceTableWidget.setObjectName("qReferenceTableWidget")
+        self.qReferenceTableWidget.setColumnCount(0)
+        self.qReferenceTableWidget.setRowCount(0)
+        self.verticalLayout.addWidget(self.qReferenceTableWidget)
         qReferenceMainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(qReferenceMainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -160,4 +160,4 @@ class Ui_qReferenceMainWindow(object):
         self.qRejectToolButton.setStatusTip(_translate("qReferenceMainWindow", "Отмена"))
 
 
-import pgcontracts_rc
+import tpylint_rc
