@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets, QtGui #, QtCore,
 import psycopg2
 import form_reference
 from tpylib import tmsgboxes as tmsg, tdebug as deb, tforms as frm
+#pylint: disable=invalid-name
 
 class CReference(QtWidgets.QMainWindow, form_reference.Ui_MainWindow):
     """ Класс реализует универсальный справочник """
@@ -109,28 +110,25 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_MainWindow):
                 #*** Получим к-во столбцов
                 l_columns = len(l_data[0])
                 #*** Преднастройка таблицы
-                frm.pre_tweak_table(self.qReferenceTableWidget, l_rows, l_columns, \
-                    [ID_COL_NUMBER, CONTRACT_TYPE_ID_COL_NUMBER], TABLE_HEADERS)
+                #!!! frm.pre_tweak_table(self.qReferenceTableWidget, l_rows, l_columns, \
+                #    [ID_COL_NUMBER, CONTRACT_TYPE_ID_COL_NUMBER], TABLE_HEADERS)
                 #*** Заполняем таблицу данными
-                frm.fill_table_with_data(self.qReferenceTableWidget, l_data, MAIN_QUERY_ALIGNS, \
-                    CONTRACT_TYPE_ID_COL_NUMBER, cns.TYPE_COLORS)
-                frm.load_table_widget(self.c_kernel, self.qReferenceTableWidget)
+                #!!! frm.fill_table_with_data(self.qReferenceTableWidget, l_data, MAIN_QUERY_ALIGNS, \
+                #    CONTRACT_TYPE_ID_COL_NUMBER, cns.TYPE_COLORS)
+                #!!! frm.load_table_widget(self.c_kernel, self.qReferenceTableWidget)
                 #*** Выводим данные в строку статуса
-                self.c_count_label.setText("Всего договоров: "+str(l_rows))
+                #!!! self.c_count_label.setText("Всего договоров: "+str(l_rows))
                 #*** Пост-настройка таблицы
                 self.qReferenceTableWidget.setSortingEnabled(True)
-                self.act_change.setEnabled(True)
-                self.act_delete.setEnabled(True)
-                if self.c_program_started > 0:
-
-                    self.c_program_started = 0
+                self.qEditToolButton.setEnabled(True)
+                self.qDeleteToolButton.setEnabled(True)
             else:
 
                 #*** Пустая выборка
                 self.qReferenceTableWidget.setRowCount(l_rows)
                 self.qReferenceTableWidget.clearContents()
-                self.act_change.setEnabled(False)
-                self.act_delete.setEnabled(False)
+                self.qEditToolButton.setEnabled(False)
+                self.qDeleteToolButton.setEnabled(False)
         except psycopg2.Error as ex:
 
             tmsg.error_occured("При обращении к базе данных возникла \
