@@ -160,4 +160,4 @@ class Ui_qReferenceMainWindow(object):
         self.qRejectToolButton.setStatusTip(_translate("qReferenceMainWindow", "Отмена"))
 
 
-from tpylib import tpylint_rc
+import tpylint_rc

@@ -2,11 +2,11 @@
 
 from PyQt5 import QtWidgets, QtGui #, QtCore,
 import psycopg2
-import form_reference
+from tpylib import form_reference
 from tpylib import tmsgboxes as tmsg, tdebug as deb, tforms as frm
 #pylint: disable=invalid-name
 
-class CReference(QtWidgets.QMainWindow, form_reference.Ui_MainWindow):
+class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
     """ Класс реализует универсальный справочник """
 
     c_kernel = None
