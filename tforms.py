@@ -111,10 +111,10 @@ def fill_table_with_data(p_widget, p_data, p_aligns, p_color_column, p_colors):
         No <p_data> parameter specified!"
     assert p_aligns is not None, "Assert: [tforms.fill_table_with_data]: \
         No <p_aligns> parameter specified!"
-    assert p_color_column is not None, "Assert: [tforms.fill_table_with_data]: \
-        No <p_color_column parameter specified!"
-    assert p_colors is not None, "Assert: [tforms.fill_table_with_data]: \
-        No <p_colors> parameter specified!"
+    # assert p_color_column is not None, "Assert: [tforms.fill_table_with_data]: \
+    #     No <p_color_column parameter specified!"
+    # assert p_colors is not None, "Assert: [tforms.fill_table_with_data]: \
+    #     No <p_colors> parameter specified!"
 
     ## To Do: получть из табль p_rows, p_cols
     #*** перебираем строки
@@ -131,7 +131,8 @@ def fill_table_with_data(p_widget, p_data, p_aligns, p_color_column, p_colors):
             p_widget.setItem(l_row, l_column, l_item)
 
             #*** Раскрашиваем строку
-            colorize_item(p_colors, p_data, l_row, p_color_column, l_item)
+            if p_color_column is not None and p_colors is not None:
+                colorize_item(p_colors, p_data, l_row, p_color_column, l_item)
     p_widget.setCurrentCell(0, 0)
 
 

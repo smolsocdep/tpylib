@@ -1,10 +1,15 @@
 """ Класс универсального справочника """
 
-from PyQt5 import QtWidgets, QtGui #, QtCore,
+from PyQt5 import QtWidgets, QtGui, QtCore,
 import psycopg2
 from tpylib import form_reference
 from tpylib import tmsgboxes as tmsg, tdebug as deb, tforms as frm
 #pylint: disable=invalid-name
+
+ID_COL_NUMBER = 0
+NAME_COL_NUMBER = 1
+TABLE_HEADERS = [" ID", "Наименование"]
+TABLE_ALIGNS = [QtCore.Qt.AlignLeft, QtCore.Qt.AlignLeft]
 
 class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
     """ Класс реализует универсальный справочник """
@@ -18,6 +23,7 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
     c_count_sql = ""
     c_trash_state = 0
     c_parameters = None
+    c_count_label = None
 
     def __init__(self, p_kernel):
         """ Constructor """
@@ -43,7 +49,14 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
     def __build_sql(self):
         """ Функция возвращает SQL готовый к исполнению"""
 
-        l_sql = c_select_sql
+        if self.c_trash_state == 0:
+
+            с_parameters["pstatus"] = 1
+        else:
+
+            с_parameters["pstatus"] = 0
+        return c_select_sql
+
 
 
     def __get_cursor(self):
@@ -67,18 +80,6 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
         pass
 
 
-    def __initialization(self):
-        """ Выполняет подготовительные действия для формы """
-        self.qAddToolButton.clicked.connect(self.__add_toolbutton_clicked)
-        self.qEditToolButton.clicked.connect(self.__edit_toolbutton_clicked)
-        self.qDeleteToolButton.clicked.connect(self.__delete_toolbutton_clicked)
-        self.qTrashToolButton.clicked.connect(self.__trash_toolbutton_clicked)
-        self.qFilterToolButton.clicked.connect(self.__filter_toolbutton_clicked)
-        self.qAcceptToolButton.clicked.connect(self.__accept_toolbutton_clicked)
-        self.qRejectToolButton.clicked.connect(self.__reject_toolbutton_clicked)
-        #!!! self.__load_form()
-        #***** Выполняем запрос
-        #!!! self.__reopen_query(self.__build_sql())
 
 
     def __reject_toolbutton_clicked(self):
@@ -89,7 +90,7 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
     def __reopen_query(self, p_query_text):
         """ Заполняет таблицу результатами выполнения запроса """
 
-        assert p_query_text is not None, "Assert: [mainform.__reopen_query]: \
+        assert p_query_text is not None, "Assert: [tpylib.treference.__reopen_query]: \
             No <p_query_text> parameter specified!"
 
         try:
@@ -110,14 +111,13 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
                 #*** Получим к-во столбцов
                 l_columns = len(l_data[0])
                 #*** Преднастройка таблицы
-                #!!! frm.pre_tweak_table(self.qReferenceTableWidget, l_rows, l_columns, \
-                #    [ID_COL_NUMBER, CONTRACT_TYPE_ID_COL_NUMBER], TABLE_HEADERS)
+                frm.pre_tweak_table(self.qReferenceTableWidget, l_rows, l_columns, \
+                    [ID_COL_NUMBER], TABLE_HEADERS)
                 #*** Заполняем таблицу данными
-                #!!! frm.fill_table_with_data(self.qReferenceTableWidget, l_data, MAIN_QUERY_ALIGNS, \
-                #    CONTRACT_TYPE_ID_COL_NUMBER, cns.TYPE_COLORS)
-                #!!! frm.load_table_widget(self.c_kernel, self.qReferenceTableWidget)
+                frm.fill_table_with_data(self.qReferenceTableWidget, l_data, TABLE_ALIGNS)
+                frm.load_table_widget(self.c_kernel, self.qReferenceTableWidget)
                 #*** Выводим данные в строку статуса
-                #!!! self.c_count_label.setText("Всего договоров: "+str(l_rows))
+                self.c_count_label.setText("Всего договоров: "+str(l_rows))
                 #*** Пост-настройка таблицы
                 self.qReferenceTableWidget.setSortingEnabled(True)
                 self.qEditToolButton.setEnabled(True)
@@ -129,11 +129,11 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
                 self.qReferenceTableWidget.clearContents()
                 self.qEditToolButton.setEnabled(False)
                 self.qDeleteToolButton.setEnabled(False)
+                self.c_count_label.setText("Всего договоров: "+str(l_rows))
         except psycopg2.Error as ex:
 
             tmsg.error_occured("При обращении к базе данных возникла \
                 исключительная ситуация!", str(ex.pgerror))
-
 
 
     def __trash_toolbutton_clicked(self):
@@ -155,6 +155,25 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
             self.c_trash_state = 0
         #*** Выводим иконку и рестартуем выборку
         self.qTrashToolButton.setIcon(l_icon)
+        self.__reopen_query(self.__build_sql())
+
+
+    def initialization(self):
+        """ Выполняет подготовительные действия для формы """
+        self.qAddToolButton.clicked.connect(self.__add_toolbutton_clicked)
+        self.qEditToolButton.clicked.connect(self.__edit_toolbutton_clicked)
+        self.qDeleteToolButton.clicked.connect(self.__delete_toolbutton_clicked)
+        self.qTrashToolButton.clicked.connect(self.__trash_toolbutton_clicked)
+        self.qFilterToolButton.clicked.connect(self.__filter_toolbutton_clicked)
+        self.qAcceptToolButton.clicked.connect(self.__accept_toolbutton_clicked)
+        self.qRejectToolButton.clicked.connect(self.__reject_toolbutton_clicked)
+        #*** Строка статуса
+        self.c_count_label = QtWidgets.QLabel("Всего договоров: ")
+        self.qStatusBar.addWidget(self.c_count_label)
+        self.c_id_label = QtWidgets.QLabel("ID: ")
+        self.qStatusBar.addWidget(self.c_id_label)
+        frm.load_form_pos_and_size(self.c_kernel, self)
+        #***** Выполняем запрос
         self.__reopen_query(self.__build_sql())
 
 

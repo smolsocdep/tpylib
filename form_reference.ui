@@ -312,7 +312,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="qStatusBar"/>
  </widget>
  <resources>
   <include location="tpylint.qrc"/>
