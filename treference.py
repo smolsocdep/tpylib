@@ -215,7 +215,9 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
                    (self.qFilterLineEdit.hasFocus()):
 
                         self.__filter_button_clicked()
-                    else:
+            else:
+
+
 
                         p_event.ignore()
 
