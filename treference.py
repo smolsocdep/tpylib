@@ -34,7 +34,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         super().__init__()
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
         self.c_kernel = p_kernel
-        deb.dout("treference", "__init__", self)
+        # deb.dout("treference", "__init__", self)
 
 
     def __accept_toolbutton_clicked(self):
@@ -115,14 +115,14 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
                 #*** Заполняем таблицу данными
                 frm.fill_table_with_data(self.qReferenceTableWidget, l_data, \
                     TABLE_ALIGNS, None, None)
-                frm.load_table_widget(self.c_kernel, self.qReferenceTableWidget)
+                #frm.load_table_widget(self.c_kernel, self.qReferenceTableWidget)
                 #*** Выводим данные в строку статуса
                 self.c_count_label.setText("Всего договоров: "+str(l_rows))
                 #*** Пост-настройка таблицы
                 self.qReferenceTableWidget.setSortingEnabled(True)
                 self.qEditToolButton.setEnabled(True)
                 self.qDeleteToolButton.setEnabled(True)
-                deb.dout("treference", "__reopen_query", "filled")
+                # deb.dout("treference", "__reopen_query", "filled")
             else:
 
                 #*** Пустая выборка
@@ -131,7 +131,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
                 self.qEditToolButton.setEnabled(False)
                 self.qDeleteToolButton.setEnabled(False)
                 self.c_count_label.setText("Всего договоров: "+str(l_rows))
-                deb.dout("treference", "__reopen_query", "empty")
+                # deb.dout("treference", "__reopen_query", "empty")
         except psycopg2.Error as ex:
 
             tmsg.error_occured("При обращении к базе данных возникла \
@@ -160,6 +160,17 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         self.__reopen_query(self.__build_sql())
 
 
+    def closeEvent(self, p_event):
+        """ Обработчик события закрытия формы """
+
+        assert p_event is not None, "Assert: [mainform.closeEvent]: \
+            No <p_event> parameter specified!"
+
+        frm.save_form_pos_and_size(self.c_kernel, self)
+        #frm.save_table_widget(self.c_kernel, self.qReferenceTableWidget)
+        p_event.accept()
+
+
     def initialization(self):
         """ Выполняет подготовительные действия для формы """
 
@@ -175,10 +186,13 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         self.qStatusBar.addWidget(self.c_count_label)
         self.c_id_label = QtWidgets.QLabel("ID: ")
         self.qStatusBar.addWidget(self.c_id_label)
+        # l_width = self.qReferenceTableWidget.width()
+        # deb.dout("treference", "initialization", l_width)
         frm.load_form_pos_and_size(self.c_kernel, self)
         # #***** Выполняем запрос
         self.__reopen_query(self.__build_sql())
-        deb.dout("treference", "initialization", "exit")
+        self.qReferenceTableWidget.horizontalHeader().resizeSections( \
+            QtWidgets.QHeaderView.ResizeToContents);
 
 
     def set_check_sql(self, p_sql):
