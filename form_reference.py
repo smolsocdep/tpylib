@@ -139,6 +139,7 @@ class Ui_qReferenceWidget(object):
         self.verticalLayout.addWidget(self.qStatusBar)
 
         self.retranslateUi(qReferenceWidget)
+        self.qRejectToolButton.clicked.connect(qReferenceWidget.close)
         QtCore.QMetaObject.connectSlotsByName(qReferenceWidget)
 
     def retranslateUi(self, qReferenceWidget):

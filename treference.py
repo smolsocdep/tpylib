@@ -195,6 +195,31 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
             QtWidgets.QHeaderView.ResizeToContents);
 
 
+    def keyPressEvent(self, p_event):
+        """ Обработчик событий от клавиатуры """
+
+        assert p_event is not None, "Assert: [mainform.keyPressEvent]: \
+            No <p_event> parameter specified!"
+        #*** Если это событие от клавиатуры...
+        if isinstance(p_event, QtGui.QKeyEvent):
+
+            #*** Если нажали Escape - закрываем программу
+            if p_event.key() == QtCore.Qt.Key_Escape:
+
+                self.__exit_action_triggered()
+                p_event.accept()
+            else:
+
+                #*** Если нажаты Ctrl-F12 и фокус в поле фильтра - включаем фильтр
+                if (p_event.key() == QtCore.Qt.Key_F12) and \
+                   (self.qFilterLineEdit.hasFocus()):
+
+                        self.__filter_button_clicked()
+                    else:
+
+                        p_event.ignore()
+
+
     def set_check_sql(self, p_sql):
         """ Задает запрос для проверки того, что элемент справочника используется """
 

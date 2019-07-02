@@ -328,5 +328,22 @@
  <resources>
   <include location="tpylint.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>qRejectToolButton</sender>
+   <signal>clicked()</signal>
+   <receiver>qReferenceWidget</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>911</x>
+     <y>24</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>934</x>
+     <y>60</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
