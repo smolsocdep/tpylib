@@ -205,13 +205,13 @@ def load_table_widget(p_kernel, p_widget):
         No <p_widget> parameter specified!"
 
     l_folder = get_etc_folder(p_kernel) + p_widget.objectName() + ".ini"
-    deb.dout("load_table_widget", l_folder)
+    # deb.dout("load_table_widget", l_folder)
     if os.path.exists(l_folder):
         #*** Заполним словарь
         l_config = configparser.ConfigParser()
         l_config.read(l_folder)
         #for l_item in l_config:
-        deb.dout("load_table_widget", l_config[cns.TABLE_SECTION])
+        # deb.dout("load_table_widget", l_config[cns.TABLE_SECTION])
         for l_col_number in range(p_widget.columnCount()):
 
             if l_config[cns.TABLE_SECTION][str(l_col_number)]:
@@ -268,7 +268,7 @@ def save_form_pos_and_size(p_kernel, p_form):
     l_config[cns.FORM_SECTION]["height"] = str(p_form.height())
     l_config[cns.FORM_SECTION]["width"] = str(p_form.width())
     #*** и сохраним его.
-    deb.dout("save_form_pos_and_size", l_folder+p_form.objectName()+".ini")
+    # deb.dout("save_form_pos_and_size", l_folder+p_form.objectName()+".ini")
     with open(l_folder+p_form.objectName()+".ini", "w") as l_ini_file:
 
         l_config.write(l_ini_file)

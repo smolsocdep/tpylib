@@ -1,17 +1,17 @@
 """ Класс универсального справочника """
 
-from PyQt5 import QtWidgets, QtGui, QtCore,
+from PyQt5 import QtWidgets, QtGui, QtCore
 import psycopg2
 from tpylib import form_reference
 from tpylib import tmsgboxes as tmsg, tdebug as deb, tforms as frm
 #pylint: disable=invalid-name
-
+#_grid = [[_background_char for column in range(_max_columns)] for row in range(_max_rows)]
 ID_COL_NUMBER = 0
 NAME_COL_NUMBER = 1
 TABLE_HEADERS = [" ID", "Наименование"]
 TABLE_ALIGNS = [QtCore.Qt.AlignLeft, QtCore.Qt.AlignLeft]
 
-class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
+class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     """ Класс реализует универсальный справочник """
 
     c_kernel = None
@@ -34,6 +34,7 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
         super().__init__()
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
         self.c_kernel = p_kernel
+        deb.dout("treference", "__init__", self)
 
 
     def __accept_toolbutton_clicked(self):
@@ -49,14 +50,14 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
     def __build_sql(self):
         """ Функция возвращает SQL готовый к исполнению"""
 
+        self.c_parameters = dict()
         if self.c_trash_state == 0:
 
-            с_parameters["pstatus"] = 1
+            self.c_parameters["pstatus"] = 1
         else:
 
-            с_parameters["pstatus"] = 0
-        return c_select_sql
-
+            self.c_parameters["pstatus"] = 0
+        return self.c_select_sql
 
 
     def __get_cursor(self):
@@ -78,8 +79,6 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
     def __filter_toolbutton_clicked(self):
         """ Обработчик кнопки qFilterToolButton """
         pass
-
-
 
 
     def __reject_toolbutton_clicked(self):
@@ -114,7 +113,8 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
                 frm.pre_tweak_table(self.qReferenceTableWidget, l_rows, l_columns, \
                     [ID_COL_NUMBER], TABLE_HEADERS)
                 #*** Заполняем таблицу данными
-                frm.fill_table_with_data(self.qReferenceTableWidget, l_data, TABLE_ALIGNS)
+                frm.fill_table_with_data(self.qReferenceTableWidget, l_data, \
+                    TABLE_ALIGNS, None, None)
                 frm.load_table_widget(self.c_kernel, self.qReferenceTableWidget)
                 #*** Выводим данные в строку статуса
                 self.c_count_label.setText("Всего договоров: "+str(l_rows))
@@ -122,6 +122,7 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
                 self.qReferenceTableWidget.setSortingEnabled(True)
                 self.qEditToolButton.setEnabled(True)
                 self.qDeleteToolButton.setEnabled(True)
+                deb.dout("treference", "__reopen_query", "filled")
             else:
 
                 #*** Пустая выборка
@@ -130,6 +131,7 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
                 self.qEditToolButton.setEnabled(False)
                 self.qDeleteToolButton.setEnabled(False)
                 self.c_count_label.setText("Всего договоров: "+str(l_rows))
+                deb.dout("treference", "__reopen_query", "empty")
         except psycopg2.Error as ex:
 
             tmsg.error_occured("При обращении к базе данных возникла \
@@ -160,6 +162,7 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
 
     def initialization(self):
         """ Выполняет подготовительные действия для формы """
+
         self.qAddToolButton.clicked.connect(self.__add_toolbutton_clicked)
         self.qEditToolButton.clicked.connect(self.__edit_toolbutton_clicked)
         self.qDeleteToolButton.clicked.connect(self.__delete_toolbutton_clicked)
@@ -173,8 +176,9 @@ class CReference(QtWidgets.QMainWindow, form_reference.Ui_qReferenceMainWindow):
         self.c_id_label = QtWidgets.QLabel("ID: ")
         self.qStatusBar.addWidget(self.c_id_label)
         frm.load_form_pos_and_size(self.c_kernel, self)
-        #***** Выполняем запрос
+        # #***** Выполняем запрос
         self.__reopen_query(self.__build_sql())
+        deb.dout("treference", "initialization", "exit")
 
 
     def set_check_sql(self, p_sql):

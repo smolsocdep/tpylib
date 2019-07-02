@@ -60,7 +60,7 @@ class CTableGuard():
     def __reopen_source_query(self): #+**
         """ Производит выборку данных для редактирования/добавления """
 
-        deb.dout("CTableGuard", "__reopen_source_query")
+        # deb.dout("CTableGuard", "__reopen_source_query")
         try:
 
             self.c_source_cursor = self.c_kernel.get_connection().cursor()
@@ -77,7 +77,7 @@ class CTableGuard():
 
         except psycopg2.Error:
 
-            deb.dout("CTableGuard", "__reopen_source_query", "Query failed")
+            # deb.dout("CTableGuard", "__reopen_source_query", "Query failed")
             return False
 
 
