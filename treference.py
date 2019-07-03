@@ -22,9 +22,9 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     c_check_sql = ""
     c_count_sql = ""
     c_trash_state = 0
+    c_filter_state = 0
     c_parameters = None
     c_count_label = None
-    c_filter_state = 0
 
     def __init__(self, p_kernel):
         """ Constructor """
@@ -63,7 +63,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         if self.c_filter_state == 1:
             l_sql += " and (fname like %(pname)s)"
             self.c_parameters["pname"] = "%"+self.qFilterLineEdit.text()+"%"
-        deb.dout("treference", "__build_sql", l_sql)
+        #deb.dout("treference", "__build_sql", l_sql)
         return l_sql
 
 

@@ -162,4 +162,4 @@ class Ui_qReferenceWidget(object):
         self.qRejectToolButton.setStatusTip(_translate("qReferenceWidget", "Отмена"))
 
 
-import tpylint_rc
+import tpylib_rc
