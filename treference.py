@@ -51,6 +51,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     def __build_sql(self):
         """ Функция возвращает SQL готовый к исполнению"""
 
+        l_sql = self.c_select_sql
         self.c_parameters = dict()
         if self.c_trash_state == 0:
 
@@ -58,7 +59,12 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         else:
 
             self.c_parameters["pstatus"] = 0
-        return self.c_select_sql
+
+        if self.c_filter_state == 1:
+            l_sql += " and (fname like %(pname)s)"
+            self.c_parameters["pname"] = "%"+self.qFilterLineEdit.text()+"%"
+        deb.dout("treference", "__build_sql", l_sql)
+        return l_sql
 
 
     def __get_cursor(self):
