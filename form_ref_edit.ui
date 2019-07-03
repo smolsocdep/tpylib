@@ -10,13 +10,32 @@
     <x>0</x>
     <y>0</y>
     <width>504</width>
-    <height>134</height>
+    <height>177</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QCheckBox" name="qModeCheckBox">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>24</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Режим изменения</string>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
@@ -53,7 +72,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -68,7 +87,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="qCancelToolButton_2">
+      <widget class="QToolButton" name="qOkToolButton">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -156,7 +175,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>qCancelToolButton_2</sender>
+   <sender>qOkToolButton</sender>
    <signal>clicked()</signal>
    <receiver>qRefItemEditDialog</receiver>
    <slot>accept()</slot>
