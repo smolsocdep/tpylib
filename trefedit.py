@@ -1,8 +1,13 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import psycopg2
 from tpylib import form_ref_edit
-from tpylib import tmsgboxes as tmsg, tdebug as deb, tforms as frm
+from tpylib import tmsgboxes as tmsg, \
+    tdebug as deb,
+    tforms as frm,
+    table_guard as guard
 
+
+SINGLE_FIELD_NAME = "fname"
 
 class CRefItemEdit(QtWidgets.QDialog, detailedit.Ui_qRefItemEditDialog):
     """ Класс окна редактирования  таблицы tbl_master """
@@ -13,6 +18,9 @@ class CRefItemEdit(QtWidgets.QDialog, detailedit.Ui_qRefItemEditDialog):
     c_record_id = None
     c_db_mode = None
     c_parameters = None
+    c_table_name = ""
+    c_insert_sql = ""
+    c_update_sql = ""
 
     def __init__(self):
         """ Конструктор """
@@ -135,26 +143,24 @@ class CRefItemEdit(QtWidgets.QDialog, detailedit.Ui_qRefItemEditDialog):
             self.c_parameters = None
 
 
-    def append_record(self, p_kernel, p_super_contract_id):
+    def append_record(self, p_kernel, p_table_name):
         """ Открывает форму в режиме добавления записи """
 
-        assert p_kernel is not None, "Assert: [detail_edit.append_record]:  \
-                                     No <p_kernel> parameter specified!"
-        assert p_super_contract_id is not None, "Assert: [detail_edit.append_record]: \
-                                      No <p_super_contract_id> parameter specified!"
+        assert p_kernel is not None, "Assert: [CRefItemEdit.append_record]:  \
+            No <p_kernel> parameter specified!"
+        assert p_table_name is not None, "Assert: [CRefItemEdit.append_record]:  \
+            No <p_table_name> parameter specified!"
 
         self.c_kernel = p_kernel
-        # self.c_super_contract_id = p_super_contract_id
         self.c_db_mode = guard.DB_MODE_INSERT
-        # self.c_contracttypes_combo = combolook.CComboLookup(self.c_kernel,
-        #                                                     CONTRACT_TYPE_QUERY)
-        # self.c_organizations_combo = combolook.CComboLookup(self.c_kernel,
-        #                                                     ORGANIZATIONS_QUERY)
-        # self.c_table_guard = guard.CTableGuard(self.c_kernel, "tbl_details")
-        # self.c_table_guard.set_query_for_insert("select {} \
-        #                                          from public.tbl_details \
-        #                                          limit 1")
-        # self.c_table_guard.set_field_list(DETAIL_FIELDS)
+        self.c_table_name = p_table_name
+        self.c_table_guard = guard.CTableGuard(self.c_kernel, self.c_table_name)
+        ## ToDo: Вот тут нужно передавать и список полей, и имя таблицы!!!!
+        ## То же самое во view_record
+        self.c_table_guard.set_query_for_insert("select  \
+                                                 from {} \
+                                                 limit 1".format(self.c_table_name))
+        self.c_table_guard.set_field_list([SINGLE_FIELD_NAME])
         self.c_table_guard.prepare()
         self.__init_data()
         self.__prepare_form()
@@ -188,3 +194,47 @@ class CRefItemEdit(QtWidgets.QDialog, detailedit.Ui_qRefItemEditDialog):
             frm.load_form_pos_and_size(self.c_kernel, self)
             self.__load_data()
             self.__prepare_form()
+
+
+    def set_insert_sql(self, p_sql):
+        """ Задает запрос для добавления элемента в справочник """
+
+        assert p_sql is not None, "Assert: [CRefItemEdit.set_insert_sql]: \
+            No <p_sql> parameter specified!"
+
+        self.c_insert_sql = p_sql
+
+
+    def set_update_sql(self, p_sql):
+        """ Задает запрос для изменения элемента справочника """
+
+        assert p_sql is not None, "Assert: [CRefItemEdit.set_update_sql]: \
+            No <p_sql> parameter specified!"
+
+        self.c_update_sql = p_sql
+
+
+    def view_record(self, p_kernel, p_table_name, p_record_id):
+        """ Открывает форму в режиме просмотра записи """
+
+        assert p_kernel is not None, "Assert: [CRefItemEdit.view_record]:  \
+            No <p_kernel> parameter specified!"
+        assert p_table_name is not None, "Assert: [CRefItemEdit.view_record]:  \
+            No <p_table_name> parameter specified!"
+        assert p_record_id is not None, "Assert: [CRefItemEdit.view_record]: \
+            No <p_record_id> parameter specified!"
+
+        self.c_kernel = p_kernel
+        self.c_table_name = p_table_name
+        self.c_record_id = p_record_id
+        self.c_db_mode = guard.DB_MODE_UPDATE
+        self.c_table_guard = guard.CTableGuard(self.c_kernel, self.c_table_name)
+        self.c_table_guard.set_query_for_update("select fname \
+                                                from {} \
+                                                where id = %(p_id)s;".format(p_table_name),
+                                                p_record_id)
+        self.c_table_guard.set_field_list(DETAIL_FIELDS)
+        self.c_table_guard.prepare()
+        frm.load_form_pos_and_size(self.c_kernel, self)
+        self.__load_data()
+        self.__prepare_form()

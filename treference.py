@@ -21,15 +21,17 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     c_delete_sql = ""
     c_check_sql = ""
     c_count_sql = ""
+    c_table_name = ""
     c_trash_state = 0
     c_filter_state = 0
     c_parameters = None
     c_count_label = None
 
+
     def __init__(self, p_kernel):
         """ Constructor """
 
-        assert p_kernel is not None, "Assert: [combo_lookup.__init__]: \
+        assert p_kernel is not None, "Assert: [CReference.__init__]: \
             No <p_kernel> parameter specified!"
 
         super().__init__()
@@ -120,7 +122,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     def __reopen_query(self, p_query_text):
         """ Заполняет таблицу результатами выполнения запроса """
 
-        assert p_query_text is not None, "Assert: [tpylib.treference.__reopen_query]: \
+        assert p_query_text is not None, "Assert: [CReference.treference.__reopen_query]: \
             No <p_query_text> parameter specified!"
 
         try:
@@ -198,7 +200,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     def closeEvent(self, p_event):
         """ Обработчик события закрытия формы """
 
-        assert p_event is not None, "Assert: [mainform.closeEvent]: \
+        assert p_event is not None, "Assert: [CReference.closeEvent]: \
             No <p_event> parameter specified!"
 
         frm.save_form_pos_and_size(self.c_kernel, self)
@@ -233,7 +235,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     def keyPressEvent(self, p_event):
         """ Обработчик событий от клавиатуры """
 
-        assert p_event is not None, "Assert: [mainform.keyPressEvent]: \
+        assert p_event is not None, "Assert: [CReference.keyPressEvent]: \
             No <p_event> parameter specified!"
         #*** Если это событие от клавиатуры...
         if isinstance(p_event, QtGui.QKeyEvent):
@@ -258,7 +260,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     def set_check_sql(self, p_sql):
         """ Задает запрос для проверки того, что элемент справочника используется """
 
-        assert p_sql is not None, "Assert: [combo_lookup.set_check_sql]: \
+        assert p_sql is not None, "Assert: [CReference.set_check_sql]: \
             No <p_sql> parameter specified!"
 
         self.c_check_sql = p_sql
@@ -267,7 +269,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     def set_count_sql(self, p_sql):
         """ Задает запрос для подсчёта элементов справочника """
 
-        assert p_sql is not None, "Assert: [combo_lookup.set_count_sql]: \
+        assert p_sql is not None, "Assert: [CReference.set_count_sql]: \
             No <p_sql> parameter specified!"
 
         self.c_count_sql = p_sql
@@ -276,7 +278,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     def set_delete_sql(self, p_sql):
         """ Задает запрос для удаления элемента справочника """
 
-        assert p_sql is not None, "Assert: [combo_lookup.set_delete_sql]: \
+        assert p_sql is not None, "Assert: [CReference.set_delete_sql]: \
             No <p_sql> parameter specified!"
 
         self.c_delete_sql = p_sql
@@ -285,7 +287,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     def set_insert_sql(self, p_sql):
         """ Задает запрос для добавления элемента в справочник """
 
-        assert p_sql is not None, "Assert: [combo_lookup.set_insert_sql]: \
+        assert p_sql is not None, "Assert: [CReference.set_insert_sql]: \
             No <p_sql> parameter specified!"
 
         self.c_insert_sql = p_sql
@@ -294,16 +296,25 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     def set_select_sql(self, p_sql):
         """ Задает запрос для выборки для просмотра справочника """
 
-        assert p_sql is not None, "Assert: [combo_lookup.set_select_sql]: \
+        assert p_sql is not None, "Assert: [CReference.set_select_sql]: \
             No <p_sql> parameter specified!"
 
         self.c_select_sql = p_sql
 
 
+    def set_table_name(self, p_table_name):
+        """ Задает имя таблицы справочника """
+
+        assert p_table_name is not None, "Assert: [CReference.set_table_name]: \
+            No <p_table_name> parameter specified!"
+
+        self.c_table_name = p_table_name
+
+
     def set_update_sql(self, p_sql):
         """ Задает запрос для изменения элемента справочника """
 
-        assert p_sql is not None, "Assert: [combo_lookup.set_update_sql]: \
+        assert p_sql is not None, "Assert: [CReference.set_update_sql]: \
             No <p_sql> parameter specified!"
 
         self.c_update_sql = p_sql
