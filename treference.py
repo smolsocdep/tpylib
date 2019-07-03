@@ -24,6 +24,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     c_trash_state = 0
     c_parameters = None
     c_count_label = None
+    c_filter_state = 0
 
     def __init__(self, p_kernel):
         """ Constructor """
@@ -78,7 +79,31 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
     def __filter_toolbutton_clicked(self):
         """ Обработчик кнопки qFilterToolButton """
-        pass
+
+        #*** В зависимости от состояния фильтра загружаем нужную иконку:
+        if self.qFilterLineEdit.text().strip():
+
+            l_icon = QtGui.QIcon()
+            if self.c_filter_state == 0:
+
+                #*** Иконка "Отключить фильтр"
+                l_icon.addPixmap(QtGui.QPixmap(":/pixmaps/icons/view-filter_off.png"),
+                                 QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                self.c_filter_state = 1
+                self.qFilterLineEdit.setReadOnly(True)
+                self.qTrashToolButton.setEnabled(False)
+            else:
+
+                #*** Иконка "Включить фильтр"
+                l_icon.addPixmap(QtGui.QPixmap(":/pixmaps/icons/view-filter_on.png"),
+                                 QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                self.c_filter_state = 0
+                self.qFilterLineEdit.setReadOnly(False)
+                self.qTrashToolButton.setEnabled(True)
+
+            #*** Выводим иконку и рестартуем выборку
+            self.qFilterToolButton.setIcon(l_icon)
+            self.__reopen_query(self.__build_sql())
 
 
     def __reject_toolbutton_clicked(self):
@@ -149,12 +174,16 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
             l_icon.addPixmap(QtGui.QPixmap(":/pixmaps/icons/user-trash-exit.png"),
                              QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.c_trash_state = 1
+            self.qFilterLineEdit.setEnabled(False)
+            self.qFilterToolButton.setEnabled(False)
         else:
 
             #*** Иконка "Открыть корзину"
             l_icon.addPixmap(QtGui.QPixmap(":/pixmaps/icons/user-trash.png"),
                              QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.c_trash_state = 0
+            self.qFilterLineEdit.setEnabled(True)
+            self.qFilterToolButton.setEnabled(True)
         #*** Выводим иконку и рестартуем выборку
         self.qTrashToolButton.setIcon(l_icon)
         self.__reopen_query(self.__build_sql())
@@ -206,20 +235,18 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
             #*** Если нажали Escape - закрываем программу
             if p_event.key() == QtCore.Qt.Key_Escape:
 
-                self.__exit_action_triggered()
+                #self.__exit_action_triggered()
+                self.close()
                 p_event.accept()
-            else:
 
                 #*** Если нажаты Ctrl-F12 и фокус в поле фильтра - включаем фильтр
-                if (p_event.key() == QtCore.Qt.Key_F12) and \
+            elif (p_event.key() == QtCore.Qt.Key_F12) and \
                    (self.qFilterLineEdit.hasFocus()):
 
-                        self.__filter_button_clicked()
+                self.__filter_toolbutton_clicked()
+
             else:
-
-
-
-                        p_event.ignore()
+                p_event.ignore()
 
 
     def set_check_sql(self, p_sql):
