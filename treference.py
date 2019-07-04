@@ -21,7 +21,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     c_delete_sql = ""
     c_check_sql = ""
     c_count_sql = ""
-    c_table_name = ""
+    c_table_name = None
     c_trash_state = 0
     c_filter_state = 0
     c_parameters = None
@@ -271,8 +271,10 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
         assert p_sql is not None, "Assert: [CReference.set_count_sql]: \
             No <p_sql> parameter specified!"
+        assert self.c_table_name is not None, "Assert: [CReference.set_count_sql]: \
+            Function <set_table_name> must be called before that function!"
 
-        self.c_count_sql = p_sql
+        self.c_count_sql = p_sql.format(table_name=[self.c_table_name])
 
 
     def set_delete_sql(self, p_sql):
@@ -280,8 +282,10 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
         assert p_sql is not None, "Assert: [CReference.set_delete_sql]: \
             No <p_sql> parameter specified!"
+        assert self.c_table_name is not None, "Assert: [CReference.set_delete_sql]: \
+            Function <set_table_name> must be called before that function!"
 
-        self.c_delete_sql = p_sql
+        self.c_delete_sql = p_sql.format(table_name=[self.c_table_name])
 
 
     def set_insert_sql(self, p_sql):
@@ -289,8 +293,10 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
         assert p_sql is not None, "Assert: [CReference.set_insert_sql]: \
             No <p_sql> parameter specified!"
+        assert self.c_table_name is not None, "Assert: [CReference.set_insert_sql]: \
+            Function <set_table_name> must be called before that function!"
 
-        self.c_insert_sql = p_sql
+        self.c_insert_sql = p_sql.format(table_name=[self.c_table_name])
 
 
     def set_select_sql(self, p_sql):
@@ -298,8 +304,10 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
         assert p_sql is not None, "Assert: [CReference.set_select_sql]: \
             No <p_sql> parameter specified!"
+        assert self.c_table_name is not None, "Assert: [CReference.set_select_sql]: \
+            Function <set_table_name> must be called before that function!"
 
-        self.c_select_sql = p_sql
+        self.c_select_sql = p_sql.format(table_name=[self.c_table_name])
 
 
     def set_table_name(self, p_table_name):
@@ -316,5 +324,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
         assert p_sql is not None, "Assert: [CReference.set_update_sql]: \
             No <p_sql> parameter specified!"
+        assert self.c_table_name is not None, "Assert: [CReference.set_update_sql]: \
+            Function <set_table_name> must be called before that function!"
 
-        self.c_update_sql = p_sql
+        self.c_update_sql = p_sql.format(table_name=[self.c_table_name])

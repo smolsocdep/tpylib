@@ -229,8 +229,9 @@ class CRefItemEdit(QtWidgets.QDialog, detailedit.Ui_qRefItemEditDialog):
         self.c_record_id = p_record_id
         self.c_db_mode = guard.DB_MODE_UPDATE
         self.c_table_guard = guard.CTableGuard(self.c_kernel, self.c_table_name)
+        ## ToDo: Вот тут получить имя таблицы из справочника и вставить
         self.c_table_guard.set_query_for_update("select fname \
-                                                from {} \
+                                                from {table_name[0]} \
                                                 where id = %(p_id)s;".format(p_table_name),
                                                 p_record_id)
         self.c_table_guard.set_field_list(DETAIL_FIELDS)
