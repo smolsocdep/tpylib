@@ -5,7 +5,7 @@
 
 import datetime
 import psycopg2
-from tpylib import tdebug as deb
+#from tpylib import tdebug as deb
 
 SQL_QUERY_COLUMNS_INFO = "select column_name, data_type, character_maximum_length \
                           from information_schema.columns \

@@ -5,7 +5,7 @@ import os.path
 import configparser
 from PyQt5 import QtWidgets, QtCore, QtGui
 import constants as cns
-from tpylib import tdebug as deb
+#from tpylib import tdebug as deb
 
 def calculate_summary_width_of_content(p_widthes, p_columns, p_hidden_columns):
     """ Вычисляет суммарную длину списка """
@@ -134,6 +134,19 @@ def fill_table_with_data(p_widget, p_data, p_aligns, p_color_column, p_colors):
             if p_color_column is not None and p_colors is not None:
                 colorize_item(p_colors, p_data, l_row, p_color_column, l_item)
     p_widget.setCurrentCell(0, 0)
+
+
+def get_current_data_column(p_widget, p_column):
+    """ Возвращает содержимое запрошенного столбца в выбранной строке """
+
+    assert p_widget is not None, "Assert: [tforms.get_current_data_column]: \
+        No <p_widget> parameter specified!"
+    assert p_column is not None, "Assert: [tforms.get_current_data_column]: \
+        No <p_column> parameter specified!"
+
+    l_row = p_widget.currentRow()
+    l_item = p_widget.item(l_row, p_column)
+    return str(l_item.text())
 
 
 def get_table_cells_value_lengths(p_widget):

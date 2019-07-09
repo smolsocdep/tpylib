@@ -3,7 +3,8 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import psycopg2
 from tpylib import form_reference
-from tpylib import tmsgboxes as tmsg, tdebug as deb, tforms as frm
+from tpylib import tmsgboxes as tmsg, tforms as frm #, tdebug as deb
+import trefedit as trefed
 #pylint: disable=invalid-name
 #_grid = [[_background_char for column in range(_max_columns)] for row in range(_max_rows)]
 ID_COL_NUMBER = 0
@@ -14,6 +15,7 @@ TABLE_ALIGNS = [QtCore.Qt.AlignLeft, QtCore.Qt.AlignLeft]
 class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     """ Класс реализует универсальный справочник """
 
+    # pylint: disable=too-many-instance-attributes
     c_kernel = None
     c_select_sql = ""
     c_insert_sql = ""
@@ -26,7 +28,8 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     c_filter_state = 0
     c_parameters = None
     c_count_label = None
-
+    c_id_label = None
+    c_ref_item_edit = None
 
     def __init__(self, p_kernel):
         """ Constructor """
@@ -37,6 +40,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         super().__init__()
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
         self.c_kernel = p_kernel
+        self.c_ref_item_edit = trefed.CRefItemEdit()
         # deb.dout("treference", "__init__", self)
 
 
@@ -47,7 +51,11 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
     def __add_toolbutton_clicked(self):
         """ Обработчик кнопки qAddToolButton """
-        pass
+        #ToDo: вот тут вставить код для передачи запросов на апдейт/инсерт
+        # и вызов CRefItemEdit.append_record
+
+        self.c_ref_item_edit.set_insert_sql(self.c_insert_sql)
+        self.c_ref_item_edit.append_record(self.c_kernel, self.c_table_name)
 
 
     def __build_sql(self):
@@ -82,7 +90,11 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
     def __edit_toolbutton_clicked(self):
         """ Обработчик кнопки qEditToolButton """
-        pass
+        #ToDo: вот тут вставить код для передачи запросов на апдейт/инсерт
+        # и вызов CRefItemEdit.view_record
+        l_id = frm.get_current_data_column(self.qReferenceTableWidge, ID_COL_NUMBER)
+        self.c_ref_item_edit.set_update_sql(self.c_update_sql)
+        self.c_ref_item_edit.view_record(self.c_kernel, self.c_table_name, l_id)
 
 
     def __filter_toolbutton_clicked(self):
@@ -229,7 +241,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         # #***** Выполняем запрос
         self.__reopen_query(self.__build_sql())
         self.qReferenceTableWidget.horizontalHeader().resizeSections( \
-            QtWidgets.QHeaderView.ResizeToContents);
+            QtWidgets.QHeaderView.ResizeToContents)
 
 
     def keyPressEvent(self, p_event):
