@@ -4,7 +4,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 import psycopg2
 from tpylib import form_reference
 from tpylib import tmsgboxes as tmsg, tforms as frm #, tdebug as deb
-import trefedit as trefed
+from tpylib import trefedit as trefed
 #pylint: disable=invalid-name
 #_grid = [[_background_char for column in range(_max_columns)] for row in range(_max_rows)]
 ID_COL_NUMBER = 0
@@ -40,8 +40,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         super().__init__()
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
         self.c_kernel = p_kernel
-        self.c_ref_item_edit = trefed.CRefItemEdit()
-        # deb.dout("treference", "__init__", self)
+        self.c_ref_item_edit = trefed.CRefItemEdit(self.c_kernel)
 
 
     def __accept_toolbutton_clicked(self):
@@ -51,11 +50,10 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
     def __add_toolbutton_clicked(self):
         """ Обработчик кнопки qAddToolButton """
-        #ToDo: вот тут вставить код для передачи запросов на апдейт/инсерт
-        # и вызов CRefItemEdit.append_record
 
         self.c_ref_item_edit.set_insert_sql(self.c_insert_sql)
         self.c_ref_item_edit.append_record(self.c_kernel, self.c_table_name)
+        self.c_ref_item_edit.open()
 
 
     def __build_sql(self):
@@ -77,12 +75,6 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         return l_sql
 
 
-    def __get_cursor(self):
-        """ Возвращает курсор """
-
-        return  self.c_kernel.get_connection().cursor()
-
-
     def __delete_toolbutton_clicked(self):
         """ Обработчик кнопки qDeleteToolButton """
         pass
@@ -90,12 +82,11 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
     def __edit_toolbutton_clicked(self):
         """ Обработчик кнопки qEditToolButton """
-        #ToDo: вот тут вставить код для передачи запросов на апдейт/инсерт
-        # и вызов CRefItemEdit.view_record
-        l_id = frm.get_current_data_column(self.qReferenceTableWidge, ID_COL_NUMBER)
+
+        l_id = frm.get_current_data_column(self.qReferenceTableWidget, ID_COL_NUMBER)
         self.c_ref_item_edit.set_update_sql(self.c_update_sql)
         self.c_ref_item_edit.view_record(self.c_kernel, self.c_table_name, l_id)
-
+        self.c_ref_item_edit.open()
 
     def __filter_toolbutton_clicked(self):
         """ Обработчик кнопки qFilterToolButton """
@@ -129,6 +120,12 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     def __reject_toolbutton_clicked(self):
         """ Обработчик кнопки qRejectToolButton """
         pass
+
+
+    def __get_cursor(self):
+        """ Возвращает курсор """
+
+        return  self.c_kernel.get_connection().cursor()
 
 
     def __reopen_query(self, p_query_text):

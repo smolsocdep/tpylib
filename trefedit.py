@@ -1,15 +1,17 @@
-from PyQt5 import QtWidgets, QtGui, QtCore
+""" Диалог редактирования элемента справочника """
+
+from PyQt5 import QtWidgets #, QtGui, QtCore
 import psycopg2
 from tpylib import form_ref_edit
 from tpylib import tmsgboxes as tmsg, \
-    tdebug as deb, \
     tforms as frm, \
     table_guard as guard
+    #tdebug as deb,
 
-
+SINGLE_FIELD_NAME_IDX = 0
 SINGLE_FIELD_NAME = "fname"
 
-class CRefItemEdit(QtWidgets.QDialog, detailedit.Ui_qRefItemEditDialog):
+class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
     """ Класс окна редактирования  таблицы tbl_master """
 
     # pylint: disable=too-many-instance-attributes
@@ -58,7 +60,7 @@ class CRefItemEdit(QtWidgets.QDialog, detailedit.Ui_qRefItemEditDialog):
     def __load_data(self):
         """ Процедура загрузки данных из БД в контролы """
 
-        self.c_table_guard.load_line_edit(self.qRefItemLineEdit, SINGLE_FIELD_NAME)
+        self.c_table_guard.load_line_edit(self.qRefItemLineEdit, SINGLE_FIELD_NAME_IDX)
 
 
     def __ok_button_pressed(self):
@@ -104,7 +106,7 @@ class CRefItemEdit(QtWidgets.QDialog, detailedit.Ui_qRefItemEditDialog):
     def __validate_data(self):
         """ Функция, осуществляющая проверку введенных данных """
 
-        return qRefItemLineEdit.text().len()>0
+        return self.qRefItemLineEdit.text().len() > 0
     #pylint: enable=no-self-use
 
 
@@ -119,11 +121,19 @@ class CRefItemEdit(QtWidgets.QDialog, detailedit.Ui_qRefItemEditDialog):
             l_query = self.c_update_sql
 
         ## ToDo: тут try впихнуть
-        self.__store_data()
-        l_cursor = self.__get_cursor()
-        l_cursor.execute(l_query, self.c_parameters)
-        self.c_kernel.get_connection().commit()
-        self.c_parameters = None
+        try:
+            self.__store_data()
+            l_cursor = self.__get_cursor()
+            l_cursor.execute(l_query, self.c_parameters)
+            self.c_kernel.get_connection().commit()
+            self.c_parameters = None
+        except psycopg2.Error as ex:
+
+            tmsg.error_occured("При обращении к базе данных возникла " + \
+                              "исключительная ситуация, возможно, " + \
+                              "сервер " + \
+                              self.c_kernel.c_settings[self.c_kernel.DB_HOST_KEY] + \
+                              " недоступен!", str(ex.pgerror))
 
 
     def append_record(self, p_kernel, p_table_name):
@@ -138,14 +148,8 @@ class CRefItemEdit(QtWidgets.QDialog, detailedit.Ui_qRefItemEditDialog):
         self.c_db_mode = guard.DB_MODE_INSERT
         self.c_table_name = p_table_name
         self.c_table_guard = guard.CTableGuard(self.c_kernel, self.c_table_name)
-        ## To Do: Вот тут нужно передавать и список полей, и имя таблицы!!!!
-        ## То же самое во view_record
-        l_sql = "select {} \
-                   from {table_name} \
-                   limit 1"
-
         self.c_table_guard.set_query_for_insert("select {} \
-                                                 from {table_name} \
+                                                 from {table_name[0]} \
                                                  limit 1".format(table_name=[self.c_table_name]))
         self.c_table_guard.set_field_list([SINGLE_FIELD_NAME])
         self.c_table_guard.prepare()
@@ -193,11 +197,11 @@ class CRefItemEdit(QtWidgets.QDialog, detailedit.Ui_qRefItemEditDialog):
         self.c_record_id = p_record_id
         self.c_db_mode = guard.DB_MODE_UPDATE
         self.c_table_guard = guard.CTableGuard(self.c_kernel, self.c_table_name)
-        ## To Do: Вот тут получить имя таблицы из справочника и вставить
-        self.c_table_guard.set_query_for_update("select {} \
-                                                from {table_name} \ #[0]
+        self.c_table_guard.set_query_for_update("select {fields[0]} \
+                                                from {table_name[0]} \
                                                 where id = %(p_id)s;".format( \
-                                                table_name=[self.c_table_name]),
+                                                table_name=[self.c_table_name],
+                                                fields=["{}"]),
                                                 p_record_id)
         self.c_table_guard.set_field_list([SINGLE_FIELD_NAME])
         self.c_table_guard.prepare()
