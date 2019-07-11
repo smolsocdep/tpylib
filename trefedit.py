@@ -5,8 +5,8 @@ import psycopg2
 from tpylib import form_ref_edit
 from tpylib import tmsgboxes as tmsg, \
     tforms as frm, \
-    table_guard as guard
-    #tdebug as deb,
+    table_guard as guard, \
+    tdebug as deb
 
 SINGLE_FIELD_NAME_IDX = 0
 SINGLE_FIELD_NAME = "fname"
@@ -54,7 +54,7 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
     def __init_data(self):
         """ Процедура очистки и инициализации контролов """
 
-        self.c_table_guard.init_line_edit(self.qRefItemLineEdit, SINGLE_FIELD_NAME)
+        self.c_table_guard.init_line_edit(self.qRefItemLineEdit, SINGLE_FIELD_NAME_IDX)
 
 
     def __load_data(self):
@@ -106,7 +106,7 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
     def __validate_data(self):
         """ Функция, осуществляющая проверку введенных данных """
 
-        return self.qRefItemLineEdit.text().len() > 0
+        return len(self.qRefItemLineEdit.text()) > 0
     #pylint: enable=no-self-use
 
 
@@ -120,6 +120,7 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
 
             l_query = self.c_update_sql
 
+        deb.dout("**************** !!!!!!!!!! *******************")
         ## ToDo: тут try впихнуть
         try:
             self.__store_data()
@@ -148,12 +149,15 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
         self.c_db_mode = guard.DB_MODE_INSERT
         self.c_table_name = p_table_name
         self.c_table_guard = guard.CTableGuard(self.c_kernel, self.c_table_name)
-        self.c_table_guard.set_query_for_insert("select {} \
+        self.c_table_guard.set_query_for_insert("select {fields[0]} \
                                                  from {table_name[0]} \
-                                                 limit 1".format(table_name=[self.c_table_name]))
+                                                 limit 1".format( \
+                                                     table_name=[self.c_table_name], \
+                                                     fields=["{}"]))
         self.c_table_guard.set_field_list([SINGLE_FIELD_NAME])
         self.c_table_guard.prepare()
         self.__init_data()
+        ##ToDo: Обработать возможную ошибку!
         self.__prepare_form()
 
 

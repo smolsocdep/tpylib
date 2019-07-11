@@ -67,14 +67,14 @@ class CTableGuard():
             #*** Получим выборку
             l_fields = ", ".join(self.c_field_list)
             l_query = self.c_source_query.format(l_fields)
-            deb.dout("CTableGuard", "__reopen_source_query", l_query)
-            deb.dout("CTableGuard", "__reopen_source_query", "*2*")
+            # deb.dout("CTableGuard", "__reopen_source_query", l_query)
+            # deb.dout("CTableGuard", "__reopen_source_query", "*2*")
             l_param = dict(p_id=self.c_id_value)
-            deb.dout("CTableGuard", "__reopen_source_query", "*3*")
+            # deb.dout("CTableGuard", "__reopen_source_query", "*3*")
             self.c_source_cursor.execute(l_query, l_param)
-            deb.dout("CTableGuard", "__reopen_source_query", "*4*")
+            # deb.dout("CTableGuard", "__reopen_source_query", "*4*")
             self.c_source_data = self.c_source_cursor.fetchall()
-            deb.dout("CTableGuard", "__reopen_source_query", self.c_source_data)
+            # deb.dout("CTableGuard", "__reopen_source_query", self.c_source_data)
             return True
 
         except psycopg2.Error:
@@ -150,7 +150,7 @@ class CTableGuard():
         self.__query_metadata()
 
         #*** Откроем выборку для загрузки в контролы
-        self.__reopen_source_query()
+        return self.__reopen_source_query()
 
 
     def get_field_value(self, p_field_idx):
