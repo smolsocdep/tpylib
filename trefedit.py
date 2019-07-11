@@ -5,8 +5,8 @@ import psycopg2
 from tpylib import form_ref_edit
 from tpylib import tmsgboxes as tmsg, \
     tforms as frm, \
-    table_guard as guard, \
-    tdebug as deb
+    table_guard as guard #, \
+    # tdebug as deb
 
 SINGLE_FIELD_NAME_IDX = 0
 SINGLE_FIELD_NAME = "fname"
@@ -43,8 +43,7 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
     def accept(self):
         """ Обработчик вызывается при вызове accept() или done() """
 
-        #ToDo: не отрабатывает эта функа!
-        # deb.dout("** 1 **")
+        #To Do: не отрабатывает эта функа!
         if self.__validate_data():
             if self.c_db_mode == guard.DB_MODE_INSERT:
 
@@ -53,13 +52,11 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
 
                 l_query = self.c_update_sql
 
-            # deb.dout("** 2 **")
             ## To Do: тут try впихнуть
             try:
 
                 self.__store_data()
                 l_cursor = self.__get_cursor()
-                deb.dout("*", l_query)
                 l_cursor.execute(l_query, self.c_parameters)
                 self.c_kernel.get_connection().commit()
                 self.c_parameters = None
@@ -77,6 +74,7 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
         """ Разрешает/запрещает работу с компонентами формы """
 
         self.qRefItemLineEdit.setEnabled(self.qModeCheckBox.isChecked())
+        self.qOkToolButton.setEnabled(self.qModeCheckBox.isChecked())
 
 
     def __get_cursor(self):

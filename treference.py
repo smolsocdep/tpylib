@@ -3,8 +3,9 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import psycopg2
 from tpylib import form_reference
-from tpylib import tmsgboxes as tmsg, tforms as frm #, tdebug as deb
+from tpylib import tmsgboxes as tmsg, tforms as frm
 from tpylib import trefedit as trefed
+from tpylib import tdebug as deb
 #pylint: disable=invalid-name
 #_grid = [[_background_char for column in range(_max_columns)] for row in range(_max_rows)]
 ID_COL_NUMBER = 0
@@ -71,7 +72,6 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         if self.c_filter_state == 1:
             l_sql += " and (fname like %(pname)s)"
             self.c_parameters["pname"] = "%"+self.qFilterLineEdit.text()+"%"
-        #deb.dout("treference", "__build_sql", l_sql)
         return l_sql
 
 
@@ -164,7 +164,6 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
                 self.qReferenceTableWidget.setSortingEnabled(True)
                 self.qEditToolButton.setEnabled(True)
                 self.qDeleteToolButton.setEnabled(True)
-                # deb.dout("treference", "__reopen_query", "filled")
             else:
 
                 #*** Пустая выборка
@@ -173,7 +172,6 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
                 self.qEditToolButton.setEnabled(False)
                 self.qDeleteToolButton.setEnabled(False)
                 self.c_count_label.setText("Всего договоров: "+str(l_rows))
-                # deb.dout("treference", "__reopen_query", "empty")
         except psycopg2.Error as ex:
 
             tmsg.error_occured("При обращении к базе данных возникла \
@@ -233,7 +231,6 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         self.c_id_label = QtWidgets.QLabel("ID: ")
         self.qStatusBar.addWidget(self.c_id_label)
         # l_width = self.qReferenceTableWidget.width()
-        # deb.dout("treference", "initialization", l_width)
         frm.load_form_pos_and_size(self.c_kernel, self)
         # #***** Выполняем запрос
         self.__reopen_query(self.__build_sql())

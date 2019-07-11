@@ -5,7 +5,8 @@
 
 import datetime
 import psycopg2
-from tpylib import tdebug as deb
+# from tpylib import tdebug as deb
+from tpylib import tmsgboxes as tmsg
 
 SQL_QUERY_COLUMNS_INFO = "select column_name, data_type, character_maximum_length \
                           from information_schema.columns \
@@ -62,24 +63,22 @@ class CTableGuard():
 
         try:
 
-            #deb.dout("CTableGuard", "__reopen_source_query", "*0*")
             self.c_source_cursor = self.c_kernel.get_connection().cursor()
             #*** Получим выборку
             l_fields = ", ".join(self.c_field_list)
             l_query = self.c_source_query.format(l_fields)
-            # deb.dout("CTableGuard", "__reopen_source_query", l_query)
-            # deb.dout("CTableGuard", "__reopen_source_query", "*2*")
             l_param = dict(p_id=self.c_id_value)
-            # deb.dout("CTableGuard", "__reopen_source_query", "*3*")
             self.c_source_cursor.execute(l_query, l_param)
-            # deb.dout("CTableGuard", "__reopen_source_query", "*4*")
             self.c_source_data = self.c_source_cursor.fetchall()
-            # deb.dout("CTableGuard", "__reopen_source_query", self.c_source_data)
             return True
 
-        except psycopg2.Error:
+        except psycopg2.Error as ex:
 
-            deb.dout("CTableGuard", "__reopen_source_query", "Query failed")
+            tmsg.error_occured("При обращении к базе данных возникла " + \
+                              "исключительная ситуация, возможно, " + \
+                              "сервер " + \
+                              self.c_kernel.c_settings[self.c_kernel.DB_HOST_KEY] + \
+                              " недоступен!", str(ex.pgerror))
             return False
 
 
@@ -94,7 +93,6 @@ class CTableGuard():
         #*** Получим курсор
         l_meta_cursor = self.c_kernel.get_connection().cursor()
         #*** Получим выборку
-        #deb.dout("__query_metadata",self.c_table_name , SQL_QUERY_COLUMNS_INFO)
         l_param = dict(p_table_name=self.c_table_name)
         l_meta_cursor.execute(SQL_QUERY_COLUMNS_INFO, l_param)
         #*** Вытащим все данные из выборки
@@ -172,7 +170,6 @@ class CTableGuard():
 
         #ToDo: Сделать обработку Integer'а и Float'а
         l_field_name = self.c_field_list[p_field_idx]
-        #deb.dout("load_line_edit", self.c_source_data)
         if self.c_field_types[l_field_name] == "character varying":
 
             p_line_edit.setText(self.c_source_data[0][p_field_idx])
