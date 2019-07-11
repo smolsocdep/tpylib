@@ -165,8 +165,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>419</x>
-     <y>107</y>
+     <x>493</x>
+     <y>157</y>
     </hint>
     <hint type="destinationlabel">
      <x>373</x>
@@ -181,12 +181,28 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>298</x>
-     <y>113</y>
+     <x>279</x>
+     <y>148</y>
     </hint>
     <hint type="destinationlabel">
-     <x>170</x>
-     <y>105</y>
+     <x>140</x>
+     <y>136</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>label</sender>
+   <signal>linkActivated(QString)</signal>
+   <receiver>qRefItemLineEdit</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>261</x>
+     <y>61</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>88</y>
     </hint>
    </hints>
   </connection>

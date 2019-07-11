@@ -81,6 +81,7 @@ class Ui_qRefItemEditDialog(object):
         self.retranslateUi(qRefItemEditDialog)
         self.qCancelToolButton.clicked.connect(qRefItemEditDialog.reject)
         self.qOkToolButton.clicked.connect(qRefItemEditDialog.accept)
+        self.label.linkActivated['QString'].connect(self.qRefItemLineEdit.setFocus)
         QtCore.QMetaObject.connectSlotsByName(qRefItemEditDialog)
 
     def retranslateUi(self, qRefItemEditDialog):

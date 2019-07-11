@@ -36,7 +36,41 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
         self.c_kernel = p_kernel
         self.qModeCheckBox.stateChanged.connect(self.__state_changed)
-        self.qOkToolButton.clicked.connect(self.__ok_button_pressed)
+        # self.accept.connect(self.__accepted)
+        # self.qOkToolButton.clicked.connect(self.__ok_button_pressed)
+
+
+    def accept(self):
+        """ Обработчик вызывается при вызове accept() или done() """
+
+        #ToDo: не отрабатывает эта функа!
+        # deb.dout("** 1 **")
+        if self.__validate_data():
+            if self.c_db_mode == guard.DB_MODE_INSERT:
+
+                l_query = self.c_insert_sql
+            else:
+
+                l_query = self.c_update_sql
+
+            # deb.dout("** 2 **")
+            ## To Do: тут try впихнуть
+            try:
+
+                self.__store_data()
+                l_cursor = self.__get_cursor()
+                deb.dout("*", l_query)
+                l_cursor.execute(l_query, self.c_parameters)
+                self.c_kernel.get_connection().commit()
+                self.c_parameters = None
+            except psycopg2.Error as ex:
+
+                tmsg.error_occured("При обращении к базе данных возникла " + \
+                                  "исключительная ситуация, возможно, " + \
+                                  "сервер " + \
+                                  self.c_kernel.c_settings[self.c_kernel.DB_HOST_KEY] + \
+                                  " недоступен!", str(ex.pgerror))
+            self.close()
 
 
     def __form_management(self):
@@ -61,13 +95,6 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
         """ Процедура загрузки данных из БД в контролы """
 
         self.c_table_guard.load_line_edit(self.qRefItemLineEdit, SINGLE_FIELD_NAME_IDX)
-
-
-    def __ok_button_pressed(self):
-        """ Обработчик кнопки 'Принять' """
-
-        if self.__validate_data():
-            self.accept()
 
 
     def __prepare_form(self):
@@ -96,7 +123,7 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
         """ Сохраняет данные из контролов в словаре параметров """
 
         self.c_parameters = dict()
-        self.c_parameters["pname"] = self.Ui_qRefItemLineEdit.text()
+        self.c_parameters["pname"] = self.qRefItemLineEdit.text()
         if self.c_db_mode == guard.DB_MODE_UPDATE:
 
             self.c_parameters["pid"] = self.c_record_id
@@ -108,33 +135,6 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
 
         return len(self.qRefItemLineEdit.text()) > 0
     #pylint: enable=no-self-use
-
-
-    def accepted(self):
-        """ Обработчик вызывается при вызове accept() или done() """
-
-        if self.c_db_mode == guard.DB_MODE_INSERT:
-
-            l_query = self.c_insert_sql
-        else:
-
-            l_query = self.c_update_sql
-
-        deb.dout("**************** !!!!!!!!!! *******************")
-        ## ToDo: тут try впихнуть
-        try:
-            self.__store_data()
-            l_cursor = self.__get_cursor()
-            l_cursor.execute(l_query, self.c_parameters)
-            self.c_kernel.get_connection().commit()
-            self.c_parameters = None
-        except psycopg2.Error as ex:
-
-            tmsg.error_occured("При обращении к базе данных возникла " + \
-                              "исключительная ситуация, возможно, " + \
-                              "сервер " + \
-                              self.c_kernel.c_settings[self.c_kernel.DB_HOST_KEY] + \
-                              " недоступен!", str(ex.pgerror))
 
 
     def append_record(self, p_kernel, p_table_name):
