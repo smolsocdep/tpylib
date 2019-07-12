@@ -8,7 +8,7 @@ from tpylib import form_ref_edit
 from tpylib import tforms as frm
 from tpylib import tmsgboxes as tmsg
 from tpylib import ttableguard as tgrd
-    # tdebug as deb
+# tdebug as deb
 
 SINGLE_FIELD_NAME_IDX = 0
 SINGLE_FIELD_NAME = "fname"
@@ -38,15 +38,13 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
         self.c_kernel = p_kernel
         self.qModeCheckBox.stateChanged.connect(self.__state_changed)
-        # self.accept.connect(self.__accepted)
-        # self.qOkToolButton.clicked.connect(self.__ok_button_pressed)
 
 
     def accept(self):
         """ Обработчик вызывается при вызове accept() или done() """
 
-        #To Do: не отрабатывает эта функа!
         if self.__validate_data():
+
             if self.c_db_mode == tgrd.DB_MODE_INSERT:
 
                 l_query = self.c_insert_sql
@@ -54,7 +52,6 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
 
                 l_query = self.c_update_sql
 
-            ## To Do: тут try впихнуть
             try:
 
                 self.__store_data()
@@ -129,12 +126,10 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
             self.c_parameters["pid"] = self.c_record_id
 
 
-    #pylint: disable=no-self-use
     def __validate_data(self):
         """ Функция, осуществляющая проверку введенных данных """
 
         return len(self.qRefItemLineEdit.text()) > 0
-    #pylint: enable=no-self-use
 
 
     def append_record(self, p_kernel, p_table_name):
@@ -155,7 +150,6 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
                                                      table_name=[self.c_table_name], \
                                                      fields=["{}"]))
         self.c_table_guard.set_field_list([SINGLE_FIELD_NAME])
-        ##ToDo: Обработать возможную ошибку!
         if self.c_table_guard.prepare():
 
             self.__init_data()
@@ -164,11 +158,13 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
 
             self.close()
 
+    #pylint: disable=invalid-name
     def closeEvent(self, p_event):
         """ Обработчик события закрытия формы """
 
         frm.save_form_pos_and_size(self.c_kernel, self)
         p_event.accept()
+    #pylint: enable=invalid-name
 
 
     def set_insert_sql(self, p_sql):

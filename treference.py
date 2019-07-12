@@ -10,9 +10,9 @@ from tpylib import tmsgboxes as tmsg
 from tpylib import trefedit as trefed
 # from tpylib import tdebug as deb
 
-#pylint: disable=invalid-name
 ID_COL_NUMBER = 0
 NAME_COL_NUMBER = 1
+
 TABLE_HEADERS = [" ID", "Наименование"]
 TABLE_ALIGNS = [QtCore.Qt.AlignLeft, QtCore.Qt.AlignLeft]
 
@@ -74,6 +74,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
             self.c_parameters["pstatus"] = 0
 
         if self.c_filter_state == 1:
+
             l_sql += " and (fname like %(pname)s)"
             self.c_parameters["pname"] = "%"+self.qFilterLineEdit.text()+"%"
         return l_sql
@@ -169,7 +170,6 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
                 #*** Заполняем таблицу данными
                 frm.fill_table_with_data(self.qReferenceTableWidget, l_data, \
                     TABLE_ALIGNS, None, None)
-                #frm.load_table_widget(self.c_kernel, self.qReferenceTableWidget)
                 #*** Выводим данные в строку статуса
                 self.c_count_label.setText("Всего договоров: "+str(l_rows))
                 #*** Пост-настройка таблицы
@@ -186,8 +186,11 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
                 self.c_count_label.setText("Всего договоров: "+str(l_rows))
         except psycopg2.Error as ex:
 
-            tmsg.error_occured("При обращении к базе данных возникла \
-                исключительная ситуация!", str(ex.pgerror))
+            tmsg.error_occured("При обращении к базе данных возникла " + \
+                               "исключительная ситуация, возможно, " + \
+                               "сервер " + \
+                               self.c_kernel.c_settings[self.c_kernel.DB_HOST_KEY] + \
+                               " недоступен!", str(ex.pgerror))
 
 
     def __trash_toolbutton_clicked(self):
@@ -216,6 +219,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         self.__reopen_query(self.__build_sql())
 
 
+    #pylint: disable=invalid-name
     def closeEvent(self, p_event):
         """ Обработчик события закрытия формы """
 
@@ -223,7 +227,6 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
             No <p_event> parameter specified!"
 
         frm.save_form_pos_and_size(self.c_kernel, self)
-        #frm.save_table_widget(self.c_kernel, self.qReferenceTableWidget)
         p_event.accept()
 
 
@@ -255,13 +258,13 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
         assert p_event is not None, "Assert: [CReference.keyPressEvent]: \
             No <p_event> parameter specified!"
+
         #*** Если это событие от клавиатуры...
         if isinstance(p_event, QtGui.QKeyEvent):
 
             #*** Если нажали Escape - закрываем программу
             if p_event.key() == QtCore.Qt.Key_Escape:
 
-                #self.__exit_action_triggered()
                 self.close()
                 p_event.accept()
 
@@ -273,6 +276,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
             else:
                 p_event.ignore()
+    #pylint: enable=invalid-name
 
 
     def set_check_sql(self, p_sql):
