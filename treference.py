@@ -5,9 +5,9 @@ import psycopg2
 from tpylib import form_reference
 from tpylib import tmsgboxes as tmsg, tforms as frm
 from tpylib import trefedit as trefed
-from tpylib import tdebug as deb
+# from tpylib import tdebug as deb
+
 #pylint: disable=invalid-name
-#_grid = [[_background_char for column in range(_max_columns)] for row in range(_max_rows)]
 ID_COL_NUMBER = 0
 NAME_COL_NUMBER = 1
 TABLE_HEADERS = [" ID", "Наименование"]
@@ -52,6 +52,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     def __add_toolbutton_clicked(self):
         """ Обработчик кнопки qAddToolButton """
 
+        self.c_ref_item_edit.finished.connect(self.__finished_dialog)
         self.c_ref_item_edit.set_insert_sql(self.c_insert_sql)
         self.c_ref_item_edit.append_record(self.c_kernel, self.c_table_name)
         self.c_ref_item_edit.open()
@@ -83,10 +84,12 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     def __edit_toolbutton_clicked(self):
         """ Обработчик кнопки qEditToolButton """
 
+        self.c_ref_item_edit.finished.connect(self.__finished_dialog)
         l_id = frm.get_current_data_column(self.qReferenceTableWidget, ID_COL_NUMBER)
         self.c_ref_item_edit.set_update_sql(self.c_update_sql)
         self.c_ref_item_edit.view_record(self.c_kernel, self.c_table_name, l_id)
         self.c_ref_item_edit.open()
+
 
     def __filter_toolbutton_clicked(self):
         """ Обработчик кнопки qFilterToolButton """
@@ -115,6 +118,12 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
             #*** Выводим иконку и рестартуем выборку
             self.qFilterToolButton.setIcon(l_icon)
             self.__reopen_query(self.__build_sql())
+
+
+    def __finished_dialog(self):
+        """ Обработчик сигнала finished диалога редактирования записи """
+
+        self.__reopen_query(self.__build_sql())
 
 
     def __reject_toolbutton_clicked(self):

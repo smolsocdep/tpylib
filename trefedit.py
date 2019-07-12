@@ -153,11 +153,14 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
                                                      table_name=[self.c_table_name], \
                                                      fields=["{}"]))
         self.c_table_guard.set_field_list([SINGLE_FIELD_NAME])
-        self.c_table_guard.prepare()
-        self.__init_data()
         ##ToDo: Обработать возможную ошибку!
-        self.__prepare_form()
+        if self.c_table_guard.prepare():
 
+            self.__init_data()
+            self.__prepare_form()
+        else:
+
+            self.close()
 
     def closeEvent(self, p_event):
         """ Обработчик события закрытия формы """
