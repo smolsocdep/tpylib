@@ -2,10 +2,12 @@
 
 from PyQt5 import QtWidgets #, QtGui, QtCore
 import psycopg2
+
 from tpylib import form_ref_edit
-from tpylib import tmsgboxes as tmsg, \
-    tforms as frm, \
-    table_guard as guard #, \
+
+from tpylib import tforms as frm
+from tpylib import tmsgboxes as tmsg
+from tpylib import ttableguard as tgrd
     # tdebug as deb
 
 SINGLE_FIELD_NAME_IDX = 0
@@ -45,7 +47,7 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
 
         #To Do: не отрабатывает эта функа!
         if self.__validate_data():
-            if self.c_db_mode == guard.DB_MODE_INSERT:
+            if self.c_db_mode == tgrd.DB_MODE_INSERT:
 
                 l_query = self.c_insert_sql
             else:
@@ -98,7 +100,7 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
     def __prepare_form(self):
         """ Выполняет предварительные работы перед выводом окна"""
 
-        if self.c_db_mode == guard.DB_MODE_INSERT:
+        if self.c_db_mode == tgrd.DB_MODE_INSERT:
 
             self.qModeCheckBox.setCheckState(True)
             self.qModeCheckBox.setEnabled(False)
@@ -122,7 +124,7 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
 
         self.c_parameters = dict()
         self.c_parameters["pname"] = self.qRefItemLineEdit.text()
-        if self.c_db_mode == guard.DB_MODE_UPDATE:
+        if self.c_db_mode == tgrd.DB_MODE_UPDATE:
 
             self.c_parameters["pid"] = self.c_record_id
 
@@ -144,9 +146,9 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
             No <p_table_name> parameter specified!"
 
         self.c_kernel = p_kernel
-        self.c_db_mode = guard.DB_MODE_INSERT
+        self.c_db_mode = tgrd.DB_MODE_INSERT
         self.c_table_name = p_table_name
-        self.c_table_guard = guard.CTableGuard(self.c_kernel, self.c_table_name)
+        self.c_table_guard = tgrd.CTableGuard(self.c_kernel, self.c_table_name)
         self.c_table_guard.set_query_for_insert("select {fields[0]} \
                                                  from {table_name[0]} \
                                                  limit 1".format( \
@@ -200,8 +202,8 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
         self.c_kernel = p_kernel
         self.c_table_name = p_table_name
         self.c_record_id = p_record_id
-        self.c_db_mode = guard.DB_MODE_UPDATE
-        self.c_table_guard = guard.CTableGuard(self.c_kernel, self.c_table_name)
+        self.c_db_mode = tgrd.DB_MODE_UPDATE
+        self.c_table_guard = tgrd.CTableGuard(self.c_kernel, self.c_table_name)
         self.c_table_guard.set_query_for_update("select {fields[0]} \
                                                 from {table_name[0]} \
                                                 where id = %(p_id)s;".format( \

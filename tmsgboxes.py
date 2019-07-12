@@ -2,10 +2,14 @@
 
 from PyQt5.QtWidgets import QMessageBox
 
+
 def ask_yes_or_no(p_text):
     """ Процедура вызывает стандартное окно выбора одной \
         из двух альтернатив и возвращает True в случае нажатия \
         кнопки <Yes> и False - если была нажата <No> """
+
+    assert p_text is not None, "Assert: [tmsgboxes.ask_yes_or_no]:  \
+        No <p_text> parameter specified!"
 
     l_msgbox = QMessageBox()
     l_msgbox.setWindowTitle("Внимание!")
@@ -19,6 +23,9 @@ def ask_yes_or_no(p_text):
 
 def error_occured(p_text, p_inform_text=""):
     """ Процедура выводит стандартное сообщение об ошибке """
+
+    assert p_text is not None, "Assert: [tmsgboxes.error_occured]:  \
+        No <p_text> parameter specified!"
 
     l_msgbox = QMessageBox()
     l_msgbox.setWindowTitle("Ошибка!!")

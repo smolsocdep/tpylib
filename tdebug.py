@@ -1,10 +1,9 @@
 """ Модуль отладочных процедур """
 
-
-# import constants as const
+__DEBUG__ = True
 
 def dout(*params):
     """ Процедура вывода отладочной информации """
 
-    # if const.__DEBUG__:
+    if __DEBUG__:
         print(params)

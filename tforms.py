@@ -3,9 +3,14 @@
 import os
 import os.path
 import configparser
+
 from PyQt5 import QtWidgets, QtCore, QtGui
-import constants as cns
+
 #from tpylib import tdebug as deb
+
+FORM_SECTION = "form"
+TABLE_SECTION = "table"
+
 
 def calculate_summary_width_of_content(p_widthes, p_columns, p_hidden_columns):
     """ Вычисляет суммарную длину списка """
@@ -21,6 +26,7 @@ def calculate_summary_width_of_content(p_widthes, p_columns, p_hidden_columns):
     for l_column in range(p_columns):
 
         if l_column not in p_hidden_columns:
+
             l_sum_width += p_widthes[l_column]
     return l_sum_width
 
@@ -42,7 +48,6 @@ def calculate_table_columns_width(p_widget, p_hidden_columns):
     l_table_width_percent = (l_table_width) / 100
 
     #*** Получим общую длину содержимого столбцов и рассчит. процент
-    ## To do: Вынести расчет суммарной ширины содержимого в отдельную процедуру
     l_sum_width = calculate_summary_width_of_content(l_widthes, p_widget.columnCount(), \
         p_hidden_columns)
     l_sum_width_percent = l_sum_width / 100
@@ -62,6 +67,7 @@ def calculate_table_columns_width(p_widget, p_hidden_columns):
 
     #*** Пересчет нужен?
     if l_recalc_flag:
+
         l_sum_width = calculate_summary_width_of_content(l_widthes, \
             p_widget.columnCount(), p_hidden_columns)
         l_sum_width_percent = l_sum_width / 100
@@ -111,12 +117,7 @@ def fill_table_with_data(p_widget, p_data, p_aligns, p_color_column, p_colors):
         No <p_data> parameter specified!"
     assert p_aligns is not None, "Assert: [tforms.fill_table_with_data]: \
         No <p_aligns> parameter specified!"
-    # assert p_color_column is not None, "Assert: [tforms.fill_table_with_data]: \
-    #     No <p_color_column parameter specified!"
-    # assert p_colors is not None, "Assert: [tforms.fill_table_with_data]: \
-    #     No <p_colors> parameter specified!"
 
-    ## To Do: получть из табль p_rows, p_cols
     #*** перебираем строки
     for l_row in range(p_widget.rowCount()):
 
@@ -129,9 +130,9 @@ def fill_table_with_data(p_widget, p_data, p_aligns, p_color_column, p_colors):
             l_item.setTextAlignment(p_aligns[l_column] | QtCore.Qt.AlignVCenter)
             #*** Добавляем новый элемент в таблицу
             p_widget.setItem(l_row, l_column, l_item)
-
             #*** Раскрашиваем строку
             if p_color_column is not None and p_colors is not None:
+
                 colorize_item(p_colors, p_data, l_row, p_color_column, l_item)
     p_widget.setCurrentCell(0, 0)
 
@@ -144,8 +145,7 @@ def get_current_data_column(p_widget, p_column):
     assert p_column is not None, "Assert: [tforms.get_current_data_column]: \
         No <p_column> parameter specified!"
 
-    l_row = p_widget.currentRow()
-    l_item = p_widget.item(l_row, p_column)
+    l_item = p_widget.item(p_widget.currentRow(), p_column)
     return str(l_item.text())
 
 
@@ -158,22 +158,10 @@ def get_table_cells_value_lengths(p_widget):
     l_row = p_widget.currentRow()
     l_widthes = dict()
     for l_column in range(p_widget.columnCount()):
+
         l_len = len(str(p_widget.item(l_row, l_column).text()))
         l_widthes[l_column] = l_len
     return l_widthes
-
-
-def get_etc_folder(p_kernel):
-    """ Возвращает строку с путём к каталогу etc """
-
-    assert p_kernel is not None, "Assert: [tforms.get_etc_folder]: \
-        No <p_kernel> parameter specified!"
-
-    l_folder = p_kernel.get_settings()[cns.PRG_PROGRAM_FOLDER_KEY]
-    l_folder += cns.ETC_FOLDER
-    if not os.path.exists(l_folder):
-        os.mkdir(l_folder)
-    return l_folder
 
 
 def load_form_pos_and_size(p_kernel, p_form):
@@ -184,7 +172,7 @@ def load_form_pos_and_size(p_kernel, p_form):
     assert p_form is not None, "Assert: [tforms.load_form_pos_and_size]: \
         No <p_form> parameter specified!"
 
-    l_folder = get_etc_folder(p_kernel)
+    l_folder = p_kernel.get_etc_folder()
     if l_folder:
 
         #*** Прочитаем словарь из ini-шки
@@ -195,12 +183,12 @@ def load_form_pos_and_size(p_kernel, p_form):
         try:
 
             #*** Выставим положение формы
-            l_top = l_config[cns.FORM_SECTION]["top"]
-            l_left = l_config[cns.FORM_SECTION]["left"]
+            l_top = l_config[FORM_SECTION]["top"]
+            l_left = l_config[FORM_SECTION]["left"]
             p_form.move(int(l_left), int(l_top))
             #*** Выставим размеры формы
-            l_height = l_config[cns.FORM_SECTION]["height"]
-            l_width = l_config[cns.FORM_SECTION]["width"]
+            l_height = l_config[FORM_SECTION]["height"]
+            l_width = l_config[FORM_SECTION]["width"]
             p_form.resize(int(l_width), int(l_height))
             #*** Прочитаем и установим размер шрифта таблицы
         except KeyError:
@@ -217,19 +205,17 @@ def load_table_widget(p_kernel, p_widget):
     assert p_widget is not None, "Assert: [tforms.save_table_widget]: \
         No <p_widget> parameter specified!"
 
-    l_folder = get_etc_folder(p_kernel) + p_widget.objectName() + ".ini"
-    # deb.dout("load_table_widget", l_folder)
+    l_folder = p_kernel.get_etc_folder() + p_widget.objectName() + ".ini"
     if os.path.exists(l_folder):
+
         #*** Заполним словарь
         l_config = configparser.ConfigParser()
         l_config.read(l_folder)
-        #for l_item in l_config:
-        # deb.dout("load_table_widget", l_config[cns.TABLE_SECTION])
         for l_col_number in range(p_widget.columnCount()):
 
-            if l_config[cns.TABLE_SECTION][str(l_col_number)]:
+            if l_config[TABLE_SECTION][str(l_col_number)]:
 
-                l_width = l_config[cns.TABLE_SECTION][str(l_col_number)]
+                l_width = l_config[TABLE_SECTION][str(l_col_number)]
                 p_widget.setColumnWidth(l_col_number, int(l_width))
 
 
@@ -255,6 +241,7 @@ def pre_tweak_table(p_widget, p_rows, p_columns, p_hide_columns, p_headers):
     p_widget.setRowCount(p_rows)
     #*** прячем столбцы
     for l_column in p_hide_columns:
+
         p_widget.hideColumn(l_column)
     #*** Задаем наименования столбцов
     p_widget.setHorizontalHeaderLabels(p_headers)
@@ -272,16 +259,15 @@ def save_form_pos_and_size(p_kernel, p_form):
     assert p_form is not None, "Assert: [tforms.save_form_pos_and_size]: \
         No <p_form> parameter specified!"
 
-    l_folder = get_etc_folder(p_kernel)
+    l_folder = p_kernel.get_etc_folder()
     #*** Заполним словарь
     l_config = configparser.ConfigParser()
-    l_config[cns.FORM_SECTION] = {}
-    l_config[cns.FORM_SECTION]["top"] = str(p_form.y())
-    l_config[cns.FORM_SECTION]["left"] = str(p_form.x())
-    l_config[cns.FORM_SECTION]["height"] = str(p_form.height())
-    l_config[cns.FORM_SECTION]["width"] = str(p_form.width())
+    l_config[FORM_SECTION] = {}
+    l_config[FORM_SECTION]["top"] = str(p_form.y())
+    l_config[FORM_SECTION]["left"] = str(p_form.x())
+    l_config[FORM_SECTION]["height"] = str(p_form.height())
+    l_config[FORM_SECTION]["width"] = str(p_form.width())
     #*** и сохраним его.
-    # deb.dout("save_form_pos_and_size", l_folder+p_form.objectName()+".ini")
     with open(l_folder+p_form.objectName()+".ini", "w") as l_ini_file:
 
         l_config.write(l_ini_file)
@@ -295,15 +281,16 @@ def save_table_widget(p_kernel, p_widget):
     assert p_widget is not None, "Assert: [tforms.save_table_widget]: \
         No <p_widget> parameter specified!"
 
-    l_folder = get_etc_folder(p_kernel)
+    l_folder = p_kernel.get_etc_folder()
 
     #*** Заполним словарь
     l_config = configparser.ConfigParser()
-    l_config[cns.TABLE_SECTION] = {}
-    l_config[cns.TABLE_SECTION]["count"] = str(p_widget.columnCount())
+    l_config[TABLE_SECTION] = {}
+    l_config[TABLE_SECTION]["count"] = str(p_widget.columnCount())
     for l_col_number in range(p_widget.columnCount()):
-        l_config[cns.TABLE_SECTION][str(l_col_number)] = str(p_widget.columnWidth(l_col_number))
-    l_config[cns.TABLE_SECTION]["fontsize"] = str(p_widget.font().pointSize())
+
+        l_config[TABLE_SECTION][str(l_col_number)] = str(p_widget.columnWidth(l_col_number))
+    l_config[TABLE_SECTION]["fontsize"] = str(p_widget.font().pointSize())
     with open(l_folder+p_widget.objectName()+".ini", "w") as l_ini_file:
 
         l_config.write(l_ini_file)
