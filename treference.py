@@ -37,7 +37,8 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     c_count_label = None
     c_id_label = None
     c_ref_item_edit = None
-    c_reference_mode = None
+    #c_reference_mode = None
+    c_selected_item_id = None
 
     def __init__(self, p_kernel):
         """ Constructor """
@@ -53,7 +54,9 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
     def __accept_toolbutton_clicked(self):
         """ Обработчик кнопки qAcceptToolButton """
-        pass
+
+        self.c_selected_item_id = frm.get_current_data_column(self.qReferenceTableWidget, \
+                                                                  ID_COL_NUMBER)
 
 
     def __add_toolbutton_clicked(self):
@@ -150,16 +153,16 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         self.__reopen_query(self.__build_sql())
 
 
-    def __reject_toolbutton_clicked(self):
-        """ Обработчик кнопки qRejectToolButton """
-
-        pass
-
-
     def __get_cursor(self):
         """ Возвращает курсор """
 
         return  self.c_kernel.get_connection().cursor()
+
+
+    def __reject_toolbutton_clicked(self):
+        """ Обработчик кнопки qRejectToolButton """
+
+        self.c_selected_item_id = None
 
 
     def __reopen_query(self, p_query_text):
@@ -269,16 +272,12 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         self.qStatusBar.addWidget(self.c_count_label)
         self.c_id_label = QtWidgets.QLabel("ID: ")
         self.qStatusBar.addWidget(self.c_id_label)
-        # l_width = self.qReferenceTableWidget.width()
         frm.load_form_pos_and_size(self.c_kernel, self)
         # #***** Выполняем запрос
         self.__reopen_query(self.__build_sql())
         self.qReferenceTableWidget.horizontalHeader().resizeSections( \
             QtWidgets.QHeaderView.ResizeToContents)
-        ##tOdO как-то надо различить вызов справочника для просмотра/добавления/
-        # удаления/изменения и вызов для выбора элемента справочника.
-        # соотв. дизейблить кнопку Принять
-        self.c_reference_mode = p_ref_mode
+        self.qAcceptToolButton.setEnabled(p_ref_mode == REFERENCE_SELECT_MODE)
 
 
     def keyPressEvent(self, p_event):
@@ -306,11 +305,13 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
                 p_event.ignore()
     #pylint: enable=invalid-name
 
-    def select(self):
-        """ Возвращает ID выбранного элемента, если была нажата кнопка 'Принять' """
-        """ в противном случае None"""
 
-        pass
+    def get_selected(self):
+        """ Возвращает ID выбранного элемента, если была нажата кнопка 'Принять'\
+            в противном случае None"""
+
+        return self.c_selected_item_id
+
 
     def set_check_sql(self, p_sql):
         """ Задает запрос для проверки того, что элемент справочника используется """
