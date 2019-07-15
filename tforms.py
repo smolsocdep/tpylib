@@ -213,10 +213,12 @@ def load_table_widget(p_kernel, p_widget):
         l_config.read(l_folder)
         for l_col_number in range(p_widget.columnCount()):
 
-            if l_config[TABLE_SECTION][str(l_col_number)]:
+            if str(l_col_number) in l_config[TABLE_SECTION]:
 
-                l_width = l_config[TABLE_SECTION][str(l_col_number)]
-                p_widget.setColumnWidth(l_col_number, int(l_width))
+                if l_config[TABLE_SECTION][str(l_col_number)]:
+
+                    l_width = l_config[TABLE_SECTION][str(l_col_number)]
+                    p_widget.setColumnWidth(l_col_number, int(l_width))
 
 
 def pre_tweak_table(p_widget, p_rows, p_columns, p_hide_columns, p_headers):

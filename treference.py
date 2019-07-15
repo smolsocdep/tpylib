@@ -57,7 +57,8 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
         self.c_selected_item_id = frm.get_current_data_column(self.qReferenceTableWidget, \
                                                                   ID_COL_NUMBER)
-
+        print("@@@@@@@@@@@@@@@", self.c_selected_item_id)
+        self.close()
 
     def __add_toolbutton_clicked(self):
         """ Обработчик кнопки qAddToolButton """
