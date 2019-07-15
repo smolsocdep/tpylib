@@ -87,9 +87,20 @@ class CComboLookup():
 
         if self.load(p_combobox):
 
-            l_index = self.find_index_by_id(p_id)
-            if l_index:
-
-                p_combobox.setCurrentIndex(l_index)
+            self.select_item(p_combobox, p_id)
             return True
         return False
+
+
+    def select_item(self, p_combobox, p_id):
+        """ Находит индекс заданного ID и выбирает этот пункт в комбо """
+
+        assert p_combobox is not None, "Assert: [CComboLookup.load_and_select]: \
+            No <p_combobox> parameter specified!"
+        assert p_id is not None, "Assert: [CComboLookup.load_and_select]: \
+            No <p_id> parameter specified!"
+
+        l_index = self.find_index_by_id(p_id)
+        if l_index:
+
+            p_combobox.setCurrentIndex(l_index)
