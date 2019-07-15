@@ -10,6 +10,9 @@ from tpylib import tmsgboxes as tmsg
 from tpylib import trefedit as trefed
 # from tpylib import tdebug as deb
 
+REFERENCE_VIEW_MODE = 0
+REFERENCE_SELECT_MODE = 1
+
 ID_COL_NUMBER = 0
 NAME_COL_NUMBER = 1
 
@@ -34,6 +37,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     c_count_label = None
     c_id_label = None
     c_ref_item_edit = None
+    c_reference_mode = None
 
     def __init__(self, p_kernel):
         """ Constructor """
@@ -82,7 +86,23 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
     def __delete_toolbutton_clicked(self):
         """ Обработчик кнопки qDeleteToolButton """
-        pass
+        if self.c_trash_state == 0:
+
+            l_msg = "Вы хотите удалить эту запись?"
+        else:
+
+            l_msg = "Вы хотите восстановить эту запись?"
+        if tmsg.ask_yes_or_no(l_msg):
+
+            #*** получим курсор
+            l_cursor = self.__get_cursor()
+            l_params = {}
+            l_params["pid"] = frm.get_current_data_column(self.qReferenceTableWidget, \
+                ID_COL_NUMBER)
+            l_params["pstatus"] = self.c_trash_state
+            l_cursor.execute(self.c_delete_sql, l_params)
+            self.c_kernel.get_connection().commit()
+            self.__reopen_query(self.__build_sql())
 
 
     def __edit_toolbutton_clicked(self):
@@ -132,6 +152,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
     def __reject_toolbutton_clicked(self):
         """ Обработчик кнопки qRejectToolButton """
+
         pass
 
 
@@ -144,7 +165,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
     def __reopen_query(self, p_query_text):
         """ Заполняет таблицу результатами выполнения запроса """
 
-        assert p_query_text is not None, "Assert: [CReference.treference.__reopen_query]: \
+        assert p_query_text is not None, "Assert: [CReference.__reopen_query]: \
             No <p_query_text> parameter specified!"
 
         try:
@@ -230,8 +251,11 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         p_event.accept()
 
 
-    def initialization(self):
+    def initialization(self, p_ref_mode):
         """ Выполняет подготовительные действия для формы """
+
+        assert p_ref_mode is not None, "Assert: [CReference.initialization]: \
+            No <p_ref_mode> parameter specified!"
 
         self.qAddToolButton.clicked.connect(self.__add_toolbutton_clicked)
         self.qEditToolButton.clicked.connect(self.__edit_toolbutton_clicked)
@@ -251,6 +275,10 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         self.__reopen_query(self.__build_sql())
         self.qReferenceTableWidget.horizontalHeader().resizeSections( \
             QtWidgets.QHeaderView.ResizeToContents)
+        ##tOdO как-то надо различить вызов справочника для просмотра/добавления/
+        # удаления/изменения и вызов для выбора элемента справочника.
+        # соотв. дизейблить кнопку Принять
+        self.c_reference_mode = p_ref_mode
 
 
     def keyPressEvent(self, p_event):
@@ -278,6 +306,11 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
                 p_event.ignore()
     #pylint: enable=invalid-name
 
+    def select(self):
+        """ Возвращает ID выбранного элемента, если была нажата кнопка 'Принять' """
+        """ в противном случае None"""
+
+        pass
 
     def set_check_sql(self, p_sql):
         """ Задает запрос для проверки того, что элемент справочника используется """
