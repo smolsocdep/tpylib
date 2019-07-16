@@ -19,32 +19,34 @@ NAME_COL_NUMBER = 1
 TABLE_HEADERS = [" ID", "Наименование"]
 TABLE_ALIGNS = [QtCore.Qt.AlignLeft, QtCore.Qt.AlignLeft]
 
-class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
+# class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
+class CReference(QtWidgets.QDialog, form_reference.Ui_qReferenceWidget):
     """ Класс реализует универсальный справочник """
 
     # pylint: disable=too-many-instance-attributes
-    c_kernel = None
-    c_select_sql = ""
-    c_insert_sql = ""
-    c_update_sql = ""
-    c_delete_sql = ""
-    c_check_sql = ""
-    c_count_sql = ""
-    c_table_name = None
-    c_trash_state = 0
-    c_filter_state = 0
-    c_parameters = None
-    c_count_label = None
-    c_id_label = None
-    c_ref_item_edit = None
-    #c_reference_mode = None
-    c_selected_item_id = None
 
     def __init__(self, p_kernel):
         """ Constructor """
 
         assert p_kernel is not None, "Assert: [CReference.__init__]: \
             No <p_kernel> parameter specified!"
+
+        self.c_kernel = None
+        self.c_select_sql = ""
+        self.c_insert_sql = ""
+        self.c_update_sql = ""
+        self.c_delete_sql = ""
+        self.c_check_sql = ""
+        self.c_count_sql = ""
+        self.c_table_name = None
+        self.c_trash_state = 0
+        self.c_filter_state = 0
+        self.c_parameters = None
+        self.c_count_label = None
+        self.c_id_label = None
+        self.c_ref_item_edit = None
+        #c_reference_mode = None
+        self.c_selected_item_id = None
 
         super().__init__()
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
@@ -57,7 +59,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 
         self.c_selected_item_id = frm.get_current_data_column(self.qReferenceTableWidget, \
                                                                   ID_COL_NUMBER)
-        print("@@@@@@@@@@@@@@@", self.c_selected_item_id)
+        print("acc.ID:", self.c_selected_item_id)
         self.close()
 
     def __add_toolbutton_clicked(self):
@@ -86,6 +88,13 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
             l_sql += " and (fname like %(pname)s)"
             self.c_parameters["pname"] = "%"+self.qFilterLineEdit.text()+"%"
         return l_sql
+
+
+    def __cell_double_clicked(self, p_row, p_column):
+        """ Обработчик одинарного клика ячейки """
+
+        self.__accept_toolbutton_clicked()
+
 
 
     def __delete_toolbutton_clicked(self):
@@ -268,6 +277,7 @@ class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
         self.qFilterToolButton.clicked.connect(self.__filter_toolbutton_clicked)
         self.qAcceptToolButton.clicked.connect(self.__accept_toolbutton_clicked)
         self.qRejectToolButton.clicked.connect(self.__reject_toolbutton_clicked)
+        self.qReferenceTableWidget.cellDoubleClicked.connect(self.__cell_double_clicked)
         #*** Строка статуса
         self.c_count_label = QtWidgets.QLabel("Всего договоров: ")
         self.qStatusBar.addWidget(self.c_count_label)

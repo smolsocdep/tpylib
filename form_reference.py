@@ -12,6 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_qReferenceWidget(object):
     def setupUi(self, qReferenceWidget):
         qReferenceWidget.setObjectName("qReferenceWidget")
+        qReferenceWidget.setWindowModality(QtCore.Qt.ApplicationModal)
         qReferenceWidget.resize(938, 465)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
