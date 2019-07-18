@@ -34,19 +34,15 @@ class CComboLookup():
             #*** Получим выборку
             l_source_cursor.execute(self.c_query)
             l_source_data = l_source_cursor.fetchall()
-            l_row_num=0
+            l_row_num = 0
             #*** Обходим выборку
             if l_source_data:
 
                 for l_row in l_source_data:
 
                     p_combobox.addItem(l_row[1])
-                    #self.c_id_dict[p_combobox.count()-1] = l_row[0]
                     self.c_id_dict[l_row_num] = l_row[0]
-                    # if l_row_num<20:
-                        # print("*** load.idx:",l_row_num,"id:", \
-                        #     self.c_id_dict[l_row_num])
-                    l_row_num+=1
+                    l_row_num += 1
                 p_combobox.setCurrentIndex(0)
             return True
         except psycopg2.Error as ex:
@@ -68,12 +64,8 @@ class CComboLookup():
         #print("## find.id:",p_id)
         for l_key in self.c_id_dict:
 
-            deb.dout("find.id:", p_id)
-            deb.dout("find.idx:", l_key)
-            # l_id = int(p_id)
             if self.c_id_dict[l_key] == p_id:
 
-                deb.dout("find.idx!!!", l_key)
                 return l_key
         return None
 
@@ -121,10 +113,9 @@ class CComboLookup():
 
         l_idx = 0
         l_count = p_count if p_count is not None else 10
-
         for l_key in self.c_id_dict:
 
             print("Key:", l_key, "Value:", self.c_id_dict[l_key])
-            l_idx+=1
+            l_idx += 1
             if l_idx == l_count:
                 break

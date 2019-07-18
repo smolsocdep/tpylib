@@ -62,6 +62,7 @@ class CReference(QtWidgets.QDialog, form_reference.Ui_qReferenceWidget):
         print("acc.ID:", self.c_selected_item_id)
         self.close()
 
+
     def __add_toolbutton_clicked(self):
         """ Обработчик кнопки qAddToolButton """
 
@@ -90,11 +91,12 @@ class CReference(QtWidgets.QDialog, form_reference.Ui_qReferenceWidget):
         return l_sql
 
 
+    # pylint: disable=unused-argument
     def __cell_double_clicked(self, p_row, p_column):
-        """ Обработчик одинарного клика ячейки """
+        """ Обработчик двойного клика ячейки """
 
         self.__accept_toolbutton_clicked()
-
+    # pylint: enable=unused-argument
 
 
     def __delete_toolbutton_clicked(self):

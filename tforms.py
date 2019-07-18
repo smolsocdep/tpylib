@@ -215,7 +215,7 @@ def load_table_widget(p_kernel, p_widget):
 
             if str(l_col_number) in l_config[TABLE_SECTION]:
 
-                if l_config[TABLE_SECTION][str(l_col_number)]:
+                if l_config[TABLE_SECTION][str(l_col_number)] is not None:
 
                     l_width = l_config[TABLE_SECTION][str(l_col_number)]
                     p_widget.setColumnWidth(l_col_number, int(l_width))
