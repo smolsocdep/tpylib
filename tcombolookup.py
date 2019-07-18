@@ -86,7 +86,7 @@ class CComboLookup():
 
         if self.__load():
 
-            self.select_item(self.c_combobox, p_id)
+            self.select_item(p_id)
             return True
         return False
 
