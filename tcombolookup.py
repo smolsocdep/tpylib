@@ -1,16 +1,19 @@
 """ Модуль реализует класс CComboLookup """
 import psycopg2
 from tpylib import tmsgboxes as tmsg
-from tpylib import tdebug as deb
+# from tpylib import tdebug as deb
 class CComboLookup():
     """ Класс реализует Lookup Combobox """
 
-    def __init__(self, p_kernel, p_query):
+    def __init__(self, p_combobox, p_kernel, p_query):
         """ Constructor """
+
         self.c_id_dict = {}
         self.c_kernel = None
         self.c_query = None
 
+        assert p_combobox is not None, "Assert: [CComboLookup.__init__]: \
+            No <p_combobox> parameter specified!"
         assert p_kernel is not None, "Assert: [CComboLookup.__init__]: \
             No <p_kernel> parameter specified!"
         assert p_query is not None, "Assert: [CComboLookup.__init__]: \
@@ -22,11 +25,9 @@ class CComboLookup():
         self.c_query = p_query
 
 
-    def load(self, p_combobox):
+    def __load(self):
         """ Загружает данные в комбобокс """
 
-        assert p_combobox is not None, "Assert: [CComboLookup.load]: \
-            No <p_combobox> parameter specified!"
         self.c_id_dict.clear()
         l_source_cursor = self.c_kernel.get_connection().cursor()
         try:
@@ -40,10 +41,10 @@ class CComboLookup():
 
                 for l_row in l_source_data:
 
-                    p_combobox.addItem(l_row[1])
+                    self.c_combobox.addItem(l_row[1])
                     self.c_id_dict[l_row_num] = l_row[0]
                     l_row_num += 1
-                p_combobox.setCurrentIndex(0)
+                self.c_combobox.setCurrentIndex(0)
             return True
         except psycopg2.Error as ex:
 
@@ -70,42 +71,35 @@ class CComboLookup():
         return None
 
 
-    def find_id_by_index(self, p_index):
+    def find_id_by_index(self):
         """ Возвращает ID по заданному индексу """
 
-        assert p_index is not None, "Assert: [CComboLookup.find_id_by_index]: \
-            No <p_index> parameter specified!"
-
-        return self.c_id_dict[p_index]
+        return(self.c_combobox.currentIndex())
 
 
-    def load_and_select(self, p_combobox, p_id):
+    def load_and_select(self, p_id):
         """Загружает данные в комбо и выбирает строку с заданным ID """
 
-        assert p_combobox is not None, "Assert: [CComboLookup.load_and_select]: \
-            No <p_combobox> parameter specified!"
         assert p_id is not None, "Assert: [CComboLookup.load_and_select]: \
             No <p_id> parameter specified!"
 
-        if self.load(p_combobox):
+        if self.load():
 
-            self.select_item(p_combobox, p_id)
+            self.select_item(self.c_combobox, p_id)
             return True
         return False
 
 
-    def select_item(self, p_combobox, p_id):
+    def select_item(self, p_id):
         """ Находит индекс заданного ID и выбирает этот пункт в комбо """
 
-        assert p_combobox is not None, "Assert: [CComboLookup.load_and_select]: \
-            No <p_combobox> parameter specified!"
         assert p_id is not None, "Assert: [CComboLookup.load_and_select]: \
             No <p_id> parameter specified!"
 
         l_index = self.find_index_by_id(p_id)
         if l_index is not None:
 
-            p_combobox.setCurrentIndex(l_index)
+            self.c_combobox.setCurrentIndex(l_index)
 
 
     def print_dict(self, p_count):
