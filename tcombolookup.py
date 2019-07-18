@@ -11,6 +11,7 @@ class CComboLookup():
         self.c_id_dict = {}
         self.c_kernel = None
         self.c_query = None
+        self.c_combobox = None
 
         assert p_combobox is not None, "Assert: [CComboLookup.__init__]: \
             No <p_combobox> parameter specified!"
@@ -19,11 +20,11 @@ class CComboLookup():
         assert p_query is not None, "Assert: [CComboLookup.__init__]: \
             No <p_query> parameter specified!"
 
+        self.c_combobox = p_combobox
         self.c_kernel = p_kernel
         #*** В запросе должно быть только два поля - идентификатор и текст,
         #*** идентификатор должен быть первым
         self.c_query = p_query
-
 
     def __load(self):
         """ Загружает данные в комбобокс """
@@ -74,7 +75,7 @@ class CComboLookup():
     def find_id_by_index(self):
         """ Возвращает ID по заданному индексу """
 
-        return(self.c_combobox.currentIndex())
+        return(self.c_id_dict[self.c_combobox.currentIndex()])
 
 
     def load_and_select(self, p_id):
@@ -83,7 +84,7 @@ class CComboLookup():
         assert p_id is not None, "Assert: [CComboLookup.load_and_select]: \
             No <p_id> parameter specified!"
 
-        if self.load():
+        if self.__load():
 
             self.select_item(self.c_combobox, p_id)
             return True
