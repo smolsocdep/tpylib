@@ -74,7 +74,7 @@ class CTableGuard():
             return False
 
 
-    def __query_metadata(self): #+**
+    def __query_metadata(self):
         """ Получает данные о полях заданной таблицы """
 
         assert self.c_field_list is not None, "Assert: [CTableGuard.__query_metadata]: \
