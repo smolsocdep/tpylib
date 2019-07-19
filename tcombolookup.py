@@ -77,7 +77,7 @@ class CComboLookup():
     def find_id_by_index(self):
         """ Возвращает ID по заданному индексу """
 
-        return(self.c_id_dict[self.c_combobox.currentIndex()])
+        return self.c_id_dict[self.c_combobox.currentIndex()]
 
 
     def load_and_select(self, p_id):
