@@ -11,40 +11,35 @@ from tpylib import tmsgboxes as tmsg
 FIELD_NAME_ORDER = 0
 FIELD_TYPE_ORDER = 1
 FIELD_WIDTH_ORDER = 2
-
 CONTROL_INSTANCE = "control"
 CONTROL_FIELDNAME = "fieldname"
 CONTROL_FIELDNUMBER = "fieldnumber"
-
 TG_FIELD_NOT_FOUND = -1
-
 FIELD_TYPE_VARCHAR = "character varying"
 FIELD_TYPE_INTEGER = "integer"
 FIELD_TYPE_DATE = "date"
-
 DB_MODE_INSERT = 0
 DB_MODE_UPDATE = 1
 
+ # pylint: disable=too-many-instance-attributes
 class CTableGuard():
     """ Класс реализует защиту БД """
 
-    # pylint: disable=too-many-instance-attributes
-    #*** Эти списки заполняются из выборки
-    c_field_count = 0 #+
-    c_field_types = {}
-    c_field_widthes = {}
-
-    c_kernel = None
-    c_table_name = ""
-    c_source_query = ""
-    c_source_data = None
-    c_source_cursor = None
-    c_field_list = None
-    c_id_value = None
-    c_parameters = None
-
     def __init__(self, p_kernel, p_table_name):
         """ Конструктор """
+
+        self.c_field_count = 0
+        #*** Эти списки заполняются из выборки
+        self.c_field_types = {}
+        self.c_field_widthes = {}
+        self.c_kernel = None
+        self.c_table_name = ""
+        self.c_source_query = ""
+        self.c_source_data = None
+        self.c_source_cursor = None
+        self.c_field_list = None
+        self.c_id_value = None
+        self.c_parameters = None
 
         assert p_kernel is not None, "Assert: [CTableGuard.__init__]: \
             No <p_kernel> parameter specified!"
@@ -151,7 +146,7 @@ class CTableGuard():
         self.c_field_count = len(p_field_list)
 
 
-    def prepare(self): #+++
+    def prepare(self):
         """ Получает данные из БД"""
 
         #*** Получим метаданные выбранной таблицы
@@ -179,7 +174,6 @@ class CTableGuard():
         assert p_field_idx is not None, "Assert: [CTableGuard.load_line_edit]: \
             No <p_field_idx> parameter specified!"
 
-        #ToDo: Сделать обработку Integer'а и Float'а
         l_field_name = self.c_field_list[p_field_idx]
         if self.c_field_types[l_field_name] == "character varying":
 
