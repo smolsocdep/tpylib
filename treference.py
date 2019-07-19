@@ -59,7 +59,7 @@ class CReference(QtWidgets.QDialog, form_reference.Ui_qReferenceWidget):
 
         self.c_selected_item_id = frm.get_current_data_column(self.qReferenceTableWidget, \
                                                                   ID_COL_NUMBER)
-        print("acc.ID:", self.c_selected_item_id)
+        # print("acc.ID:", self.c_selected_item_id)
         self.close()
 
 
@@ -69,7 +69,8 @@ class CReference(QtWidgets.QDialog, form_reference.Ui_qReferenceWidget):
         self.c_ref_item_edit.finished.connect(self.__finished_dialog)
         self.c_ref_item_edit.set_insert_sql(self.c_insert_sql)
         self.c_ref_item_edit.append_record(self.c_kernel, self.c_table_name)
-        self.c_ref_item_edit.open()
+        self.c_ref_item_edit.exec()
+        self.__reopen_query(self.__build_sql())
 
 
     def __build_sql(self):
@@ -127,7 +128,8 @@ class CReference(QtWidgets.QDialog, form_reference.Ui_qReferenceWidget):
         l_id = frm.get_current_data_column(self.qReferenceTableWidget, ID_COL_NUMBER)
         self.c_ref_item_edit.set_update_sql(self.c_update_sql)
         self.c_ref_item_edit.view_record(self.c_kernel, self.c_table_name, l_id)
-        self.c_ref_item_edit.open()
+        self.c_ref_item_edit.exec()
+        self.__reopen_query(self.__build_sql())
 
 
     def __filter_toolbutton_clicked(self):

@@ -27,7 +27,7 @@ class CComboLookup():
         self.c_query = p_query
 
 
-    def __load(self):
+    def load(self):
         """ Загружает данные в комбобокс """
 
         self.c_id_dict.clear()
@@ -85,7 +85,7 @@ class CComboLookup():
         assert p_id is not None, "Assert: [CComboLookup.load_and_select]: \
             No <p_id> parameter specified!"
 
-        if self.__load():
+        if self.load():
 
             self.select_item(p_id)
             return True
