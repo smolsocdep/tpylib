@@ -26,6 +26,7 @@ class CComboLookup():
         #*** идентификатор должен быть первым
         self.c_query = p_query
 
+
     def __load(self):
         """ Загружает данные в комбобокс """
 
