@@ -2,6 +2,7 @@
 import psycopg2
 from tpylib import tmsgboxes as tmsg
 # from tpylib import tdebug as deb
+
 class CComboLookup():
     """ Класс реализует Lookup Combobox """
 
@@ -31,6 +32,7 @@ class CComboLookup():
         """ Загружает данные в комбобокс """
 
         self.c_id_dict.clear()
+        self.c_combobox.clear()
         l_source_cursor = self.c_kernel.get_connection().cursor()
         try:
 
@@ -64,7 +66,6 @@ class CComboLookup():
         assert p_id is not None, "Assert: [CComboLookup.find_index_by_id]: \
             No <p_id> parameter specified!"
 
-        #print("## find.id:",p_id)
         for l_key in self.c_id_dict:
 
             if self.c_id_dict[l_key] == p_id:
@@ -104,14 +105,13 @@ class CComboLookup():
             self.c_combobox.setCurrentIndex(l_index)
 
 
-    def print_dict(self, p_count):
-        """ Выводит содержимое словаря """
-
-        l_idx = 0
-        l_count = p_count if p_count is not None else 10
-        for l_key in self.c_id_dict:
-
-            print("Key:", l_key, "Value:", self.c_id_dict[l_key])
-            l_idx += 1
-            if l_idx == l_count:
-                break
+    # def print_dict(self, p_count):
+    #     """ Выводит содержимое словаря """
+    #
+    #     l_idx = 0
+    #     l_count = p_count if p_count is not None else 10
+    #     for l_key in self.c_id_dict:
+    #
+    #         l_idx += 1
+    #         if l_idx == l_count:
+    #             break

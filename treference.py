@@ -12,14 +12,11 @@ from tpylib import trefedit as trefed
 
 REFERENCE_VIEW_MODE = 0
 REFERENCE_SELECT_MODE = 1
-
 ID_COL_NUMBER = 0
 NAME_COL_NUMBER = 1
-
 TABLE_HEADERS = [" ID", "Наименование"]
 TABLE_ALIGNS = [QtCore.Qt.AlignLeft, QtCore.Qt.AlignLeft]
 
-# class CReference(QtWidgets.QWidget, form_reference.Ui_qReferenceWidget):
 class CReference(QtWidgets.QDialog, form_reference.Ui_qReferenceWidget):
     """ Класс реализует универсальный справочник """
 
@@ -45,7 +42,6 @@ class CReference(QtWidgets.QDialog, form_reference.Ui_qReferenceWidget):
         self.c_count_label = None
         self.c_id_label = None
         self.c_ref_item_edit = None
-        #c_reference_mode = None
         self.c_selected_item_id = None
 
         super().__init__()
@@ -59,7 +55,6 @@ class CReference(QtWidgets.QDialog, form_reference.Ui_qReferenceWidget):
 
         self.c_selected_item_id = frm.get_current_data_column(self.qReferenceTableWidget, \
                                                                   ID_COL_NUMBER)
-        # print("acc.ID:", self.c_selected_item_id)
         self.close()
 
 
@@ -102,6 +97,7 @@ class CReference(QtWidgets.QDialog, form_reference.Ui_qReferenceWidget):
 
     def __delete_toolbutton_clicked(self):
         """ Обработчик кнопки qDeleteToolButton """
+
         if self.c_trash_state == 0:
 
             l_msg = "Вы хотите удалить эту запись?"

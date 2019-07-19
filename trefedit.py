@@ -13,21 +13,22 @@ from tpylib import ttableguard as tgrd
 SINGLE_FIELD_NAME_IDX = 0
 SINGLE_FIELD_NAME = "fname"
 
+    # pylint: disable=too-many-instance-attributes
 class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
     """ Класс окна редактирования  таблицы tbl_master """
 
-    # pylint: disable=too-many-instance-attributes
-    c_kernel = None
-    c_table_guard = None
-    c_record_id = None
-    c_db_mode = None
-    c_parameters = None
-    c_table_name = ""
-    c_insert_sql = ""
-    c_update_sql = ""
 
     def __init__(self, p_kernel):
         """ Конструктор """
+
+        self.c_kernel = None
+        self.c_table_guard = None
+        self.c_record_id = None
+        self.c_db_mode = None
+        self.c_parameters = None
+        self.c_table_name = ""
+        self.c_insert_sql = ""
+        self.c_update_sql = ""
 
         assert p_kernel is not None, "Assert: [CRefItemEdit.__init__]: \
             No <p_kernel> parameter specified!"
@@ -157,6 +158,7 @@ class CRefItemEdit(QtWidgets.QDialog, form_ref_edit.Ui_qRefItemEditDialog):
         else:
 
             self.close()
+
 
     #pylint: disable=invalid-name
     def closeEvent(self, p_event):
