@@ -101,8 +101,6 @@ class CReference(QtWidgets.QDialog, form_reference.Ui_qReferenceWidget):
         #*** получим курсор
         l_cursor = self.__get_cursor()
         l_params = {}
-        print("Id:", frm.get_current_data_column(self.qReferenceTableWidget, \
-            ID_COL_NUMBER))
         l_params["pid"] = frm.get_current_data_column(self.qReferenceTableWidget, \
             ID_COL_NUMBER)
         l_cursor.execute(self.c_check_sql, l_params)
