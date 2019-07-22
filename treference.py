@@ -95,26 +95,52 @@ class CReference(QtWidgets.QDialog, form_reference.Ui_qReferenceWidget):
     # pylint: enable=unused-argument
 
 
+    def __check_linked(self):
+        """ Проверяет, связан ли данный элемент справочника с другими таблицами. """
+
+        #*** получим курсор
+        l_cursor = self.__get_cursor()
+        l_params = {}
+        print("Id:", frm.get_current_data_column(self.qReferenceTableWidget, \
+            ID_COL_NUMBER))
+        l_params["pid"] = frm.get_current_data_column(self.qReferenceTableWidget, \
+            ID_COL_NUMBER)
+        l_cursor.execute(self.c_check_sql, l_params)
+        l_data = l_cursor.fetchall()
+        return l_data[0][0]
+
+
     def __delete_toolbutton_clicked(self):
         """ Обработчик кнопки qDeleteToolButton """
+	    #ToDo: перед удалением проверять, используется ли где-нибудь этот элемент
 
-        if self.c_trash_state == 0:
+        #*** Если корзина выключена и нет привязок или корзина включена =
+        #*** нет препятствий к удалению
+        print("Cnt:", self.__check_linked())
+        if ((self.c_trash_state == 0) and (self.__check_linked() == 0)) or \
+            (self.c_trash_state == 1):
 
-            l_msg = "Вы хотите удалить эту запись?"
+            if self.c_trash_state == 0:
+
+                l_msg = "Вы хотите удалить эту запись?"
+            else:
+
+                l_msg = "Вы хотите восстановить эту запись?"
+
+            if tmsg.ask_yes_or_no(l_msg):
+
+                #*** получим курсор
+                l_cursor = self.__get_cursor()
+                l_params = {}
+                l_params["pid"] = frm.get_current_data_column(self.qReferenceTableWidget, \
+                    ID_COL_NUMBER)
+                l_params["pstatus"] = self.c_trash_state
+                l_cursor.execute(self.c_delete_sql, l_params)
+                self.c_kernel.get_connection().commit()
+                self.__reopen_query(self.__build_sql())
         else:
-
-            l_msg = "Вы хотите восстановить эту запись?"
-        if tmsg.ask_yes_or_no(l_msg):
-
-            #*** получим курсор
-            l_cursor = self.__get_cursor()
-            l_params = {}
-            l_params["pid"] = frm.get_current_data_column(self.qReferenceTableWidget, \
-                ID_COL_NUMBER)
-            l_params["pstatus"] = self.c_trash_state
-            l_cursor.execute(self.c_delete_sql, l_params)
-            self.c_kernel.get_connection().commit()
-            self.__reopen_query(self.__build_sql())
+            tmsg.error_occured("Этот элемент справочника используется " + \
+                               "и не может быть удалён!")
 
 
     def __edit_toolbutton_clicked(self):
