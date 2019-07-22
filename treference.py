@@ -112,11 +112,8 @@ class CReference(QtWidgets.QDialog, form_reference.Ui_qReferenceWidget):
 
     def __delete_toolbutton_clicked(self):
         """ Обработчик кнопки qDeleteToolButton """
-	    #ToDo: перед удалением проверять, используется ли где-нибудь этот элемент
-
         #*** Если корзина выключена и нет привязок или корзина включена =
         #*** нет препятствий к удалению
-        print("Cnt:", self.__check_linked())
         if ((self.c_trash_state == 0) and (self.__check_linked() == 0)) or \
             (self.c_trash_state == 1):
 
