@@ -195,14 +195,16 @@ class CTableGuard():
 
             p_date_edit.setDate(self.c_source_data[0][p_field_idx])
 
-
     def init_line_edit(self, p_line_edit, p_field_idx):
-        """ Очищает контрол и задает макс. длину """
-
-        assert p_line_edit is not None, "Assert: [CTableGuard.init_line_edit]: \
-            No <p_line_edit> parameter specified!"
-        assert p_field_idx is not None, "Assert: [CTableGuard.init_line_edit]: \
-            No <p_field_idx> parameter specified!"
+        """Очищает контрол и задает макс. длину."""
+        assert p_line_edit is not None, ("Assert: [CTableGuard."
+                                         "init_line_edit]:"
+                                         "No <p_line_edit> parameter "
+                                         "specified!")
+        assert p_field_idx is not None, ("Assert: [CTableGuard."
+                                         "init_line_edit]:"
+                                         "No <p_field_idx> parameter "
+                                         "specified!")
 
         l_field_name = self.c_field_list[p_field_idx]
         if self.c_field_types[l_field_name] == "character varying":
@@ -210,12 +212,12 @@ class CTableGuard():
             p_line_edit.setText("")
             p_line_edit.setMaxLength(self.c_field_widthes[l_field_name])
 
-
-    #pylint: disable=no-self-use
-    def init_date_edit(self, p_date_edit): #+++
-        """ Задает текущую дату редактору дат """
-
-        assert p_date_edit is not None, "Assert: [CTableGuard.init_date_edit]: \
-            No <p_date_edit> parameter specified!"
+    # pylint: disable=no-self-use
+    def init_date_edit(self, p_date_edit):
+        """Задает текущую дату редактору дат."""
+        assert p_date_edit is not None, ("Assert: [CTableGuard."
+                                         "init_date_edit]:"
+                                         "No <p_date_edit> parameter "
+                                         "specified!")
 
         p_date_edit.setDate(datetime.datetime.now())
