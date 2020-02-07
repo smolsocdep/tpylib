@@ -115,11 +115,14 @@ class CTableGuard():
                                                "__query_metadata]:"
                                                "No field list was defined in "
                                                "CTableGuard!")
+        # print("****** __query_metadata")
         try:
 
+            # print("*** 0.1 ", self.c_connection)
             # *** Получим курсор
             l_meta_cursor = self.c_connection.cursor()
             # *** Получим выборку
+            # print("*** 0.2 ", l_meta_cursor)
             l_param = dict(p_table_name=self.c_table_name)
             l_query = """select column_name, data_type,
                                 character_maximum_length
@@ -132,18 +135,24 @@ class CTableGuard():
             # *** Получим кол-во строк
             l_rows = len(l_meta_data)
             # *** если выборка не пустая...
+            # print("*** 1 ")
             if l_rows > 0:
 
+                # print("*** 2 ")
                 for l_meta_row in l_meta_data:
 
                     if self.c_field_list.count(l_meta_row[0]):
 
+                        # print("*** 3 ")
                         self.c_field_types[l_meta_row[0]] = l_meta_row[1]
                         self.c_field_widthes[l_meta_row[0]] = l_meta_row[2]
             return True, ""
 
         except psycopg2.Error as ex:  # noqa
 
+            # print("**** Exception!")
+            # print("ex:", ex)
+            # print("ex.pgerror:", ex.pgerror)
             return False, (f"!!! При обращении к базе данных возникла "
                            "исключительная ситуация !!! : {ex}:{ex.pgerror}")
 
@@ -180,7 +189,7 @@ class CTableGuard():
         """Получает данные из БД."""
         # *** Получим метаданные выбранной таблицы
         if self.__query_metadata():
-
+            # print("!!!! prepare")
             # *** Откроем выборку для загрузки в контролы
             return self.__reopen_source_query()
         return False
@@ -193,18 +202,6 @@ class CTableGuard():
                                          "parameter specified!")
 
         return self.c_source_data[0][p_field_idx]
-
-    def get_string_field_max_length(self, pi_field_idx):
-        """Возвращает максимально возможную длину строки для этого поля."""
-        assert pi_field_idx is not None, ("Assert: [CTableGuard."
-                                          "get_string_field_max_length]:"
-                                          "No <pi_field_idx> parameter "
-                                          "specified!")
-        ls_field_name = self.c_field_list[pi_field_idx]
-        if self.c_field_types[ls_field_name] == FIELD_TYPE_VARCHAR:
-
-            return self.c_field_widthes[ls_field_name]
-        return -1
 
     def load_line_edit(self, p_line_edit, p_field_idx):
         """Загружает данные в строку ввода и задает макс. длину."""
@@ -258,3 +255,13 @@ class CTableGuard():
 
             l_length = self.c_field_widthes[l_field_name]
         return l_length
+
+    # pylint: disable=no-self-use
+    def init_date_edit(self, p_date_edit):
+        """Задает текущую дату редактору дат."""
+        assert p_date_edit is not None, ("Assert: [CTableGuard."
+                                         "init_date_edit]:"
+                                         "No <p_date_edit> parameter "
+                                         "specified!")
+
+        p_date_edit.setDate(datetime.datetime.now())
