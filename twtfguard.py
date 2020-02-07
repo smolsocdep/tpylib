@@ -76,8 +76,10 @@ class CWTFGuard(tguard.CTableGuard):
 
             lo_validators.append(Length(max=li_length))
 
-        return StringField(ps_label, ps_default,
-                           validators=lo_validators)
+            return StringField(ps_label, ps_default,
+                               validators=lo_validators)
+        raise TypeError(f"Поле N{pi_field_idx} не текстовое!")
+        return None
 
     def load_line_edit(self, p_line_edit, p_field_idx):
         """Загружает данные в строку ввода и задает макс. длину."""
