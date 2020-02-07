@@ -40,7 +40,7 @@
 #                                   REGISTRATION_DATE_FIELD_NUMBER)
 #  c_table_guard.load_date_edit(self.qRecordDateEdit, RECORD_DATE_FIELD_NUMBER)
 
-# import datetime
+import datetime
 # import psycopg2
 
 import ttableguard as tguard
@@ -64,9 +64,15 @@ class CWTFGuard(tguard.CTableGuard):
     #                                        "No <ps_table_name> parameter "
     #                                        "specified!")
 
-    def init_string_field(self, ps_label, po_field, pi_field_idx,
+    def init_string_field(self, ps_label, pi_field_idx,
                           ps_default="", pbl_required=False):
-        """Производит настройку строкового компонента WTForm."""
+        """Создает поле типа String WTForm с нужными параметрами."""
+        assert ps_label is not None, ("Assert: [CWTFGuard.__init__]:"
+                                      "No <ps_label> parameter "
+                                      "specified!")
+        assert pi_field_idx is not None, ("Assert: [CWTFGuard.__init__]:"
+                                          "No <pi_field_idx> parameter "
+                                          "specified!")
         lo_validators = []
         if pbl_required:
 
@@ -80,6 +86,19 @@ class CWTFGuard(tguard.CTableGuard):
                                validators=lo_validators)
         raise TypeError(f"Поле N{pi_field_idx} не текстовое!")
         return None
+
+    def init_date_field(self, ps_label, pi_field_idx,
+                        pdt_default=datetime.datetime.now(),
+                        pbl_required=False):
+        """Создает поле типа DateField WTForm с нужными параметрами."""
+        return DateField(ps_label, pdt_default
+                                       default=datetime.datetime.now(),
+                                       validators=[DataRequired("""Поле
+                                                             должно быть
+                                                             заполнено"""
+                                                                )]
+                                       )
+        pass
 
     def load_line_edit(self, p_line_edit, p_field_idx):
         """Загружает данные в строку ввода и задает макс. длину."""
@@ -113,23 +132,3 @@ class CWTFGuard(tguard.CTableGuard):
         if self.c_field_types[l_field_name] == "date":
 
             p_date_edit.setDate(self.c_source_data[0][p_field_idx])
-
-    def init_line_edit(self, p_field_idx):
-        """Очищает контрол и задает макс. длину."""
-        assert p_field_idx is not None, ("Assert: [CTableGuard."
-                                         "init_line_edit]:"
-                                         "No <p_field_idx> parameter "
-                                         "specified!")
-        # print("===============================")
-        # print("Field list:")
-        # print(self.c_field_list)
-        l_field_name = self.c_field_list[p_field_idx]
-        l_length = -1
-        # print("===============================")
-        # print("Field types:")
-        # print(self.c_field_types)
-
-        if self.c_field_types[l_field_name] == "character varying":
-
-            l_length = self.c_field_widthes[l_field_name]
-        return l_length
