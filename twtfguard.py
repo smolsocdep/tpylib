@@ -43,7 +43,7 @@
 import datetime
 # import psycopg2
 
-import ttableguard as tguard
+from tpylib import ttableguard as tguard
 from wtforms import StringField, DateField
 from wtforms.validators import DataRequired, Length
 
@@ -82,8 +82,27 @@ class CWTFGuard(tguard.CTableGuard):
 
             lo_validators.append(Length(max=li_length))
 
-            return StringField(ps_label, ps_default,
+            return StringField(ps_label,
+                               default=ps_default,
                                validators=lo_validators)
+            # subject_field = StringField('Предмет:',
+            #                             default="",
+            #                             validators=[DataRequired(
+            #                                         """Поле должно быть
+            #                                             заполнено"""),
+            #                                         Length(max=20)])
+            # if pbl_required:
+            #
+            #     #print("=== 3")
+            #     return StringField(ps_label, default=ps_default,
+            #                        validators=[DataRequired(IS_REQUIRED),
+            #                                    Length(max=li_length)])
+            # else:
+            #
+            #     #print("=== 4")
+            #     return StringField(ps_label, default=ps_default,
+            #                        validators=[Length(max=li_length)])
+
         raise TypeError(f"Поле N{pi_field_idx} не текстовое!")
         return None
 
@@ -91,14 +110,10 @@ class CWTFGuard(tguard.CTableGuard):
                         pdt_default=datetime.datetime.now(),
                         pbl_required=False):
         """Создает поле типа DateField WTForm с нужными параметрами."""
-        return DateField(ps_label, pdt_default
-                                       default=datetime.datetime.now(),
-                                       validators=[DataRequired("""Поле
-                                                             должно быть
-                                                             заполнено"""
-                                                                )]
-                                       )
-        pass
+        if pbl_required:
+            return DateField(ps_label, pdt_default)
+        return DateField(ps_label, pdt_default,
+                         validators=[DataRequired(FIELD_IS_REQUIRED)])
 
     def load_line_edit(self, p_line_edit, p_field_idx):
         """Загружает данные в строку ввода и задает макс. длину."""
