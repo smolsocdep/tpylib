@@ -111,9 +111,11 @@ class CWTFGuard(tguard.CTableGuard):
                         pbl_required=False):
         """Создает поле типа DateField WTForm с нужными параметрами."""
         if pbl_required:
-            return DateField(ps_label, pdt_default)
-        return DateField(ps_label, pdt_default,
-                         validators=[DataRequired(FIELD_IS_REQUIRED)])
+
+            return DateField(ps_label,
+                             default=pdt_default,
+                             validators=[DataRequired(FIELD_IS_REQUIRED)])
+        return DateField(ps_label, default=pdt_default)
 
     def load_line_edit(self, p_line_edit, p_field_idx):
         """Загружает данные в строку ввода и задает макс. длину."""
