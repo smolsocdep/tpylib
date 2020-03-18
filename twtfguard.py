@@ -48,6 +48,7 @@ from wtforms import StringField, DateField
 from wtforms.validators import DataRequired, Length
 
 FIELD_IS_REQUIRED = "Поле должно быть заполнено"
+FIELD_IS_TOO_LONG = """Длина текста не может быть более %(max)s знаков!"""
 
 
 #  pylint: disable=too-many-instance-attributes
@@ -80,7 +81,8 @@ class CWTFGuard(tguard.CTableGuard):
         li_length = self.get_string_field_max_length(pi_field_idx)
         if li_length > 0:
 
-            lo_validators.append(Length(max=li_length))
+            lo_validators.append(Length(max=li_length,
+                                        message=FIELD_IS_TOO_LONG))
 
             return StringField(ps_label,
                                default=ps_default,

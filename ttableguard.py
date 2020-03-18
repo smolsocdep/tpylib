@@ -40,7 +40,7 @@
 #                                   REGISTRATION_DATE_FIELD_NUMBER)
 #  c_table_guard.load_date_edit(self.qRecordDateEdit, RECORD_DATE_FIELD_NUMBER)
 
-import datetime
+# import datetime
 import psycopg2
 
 FIELD_NAME_ORDER = 0
@@ -95,11 +95,17 @@ class CTableGuard():
         try:
 
             self.c_source_cursor = self.c_connection.cursor()
-            # *** Получим выборку
             l_fields = ", ".join(self.c_field_list)
+            # *** Получим выборку
+            # print("~~~~ Fields: ", l_fields)
             l_query = self.c_source_query.format(l_fields)
-            l_param = dict(p_id=self.c_id_value)
-            self.c_source_cursor.execute(l_query, l_param)
+            # print("~~~~ Query: ", l_query)
+            if self.c_id_value is not None:
+                l_param = dict(p_id=self.c_id_value)
+                # print("~~~~ Params: ", l_param)
+                self.c_source_cursor.execute(l_query, l_param)
+            else:
+                self.c_source_cursor.execute(l_query)
             self.c_source_data = self.c_source_cursor.fetchall()
             return True, ""
 
@@ -116,7 +122,7 @@ class CTableGuard():
                                                "No field list was defined in "
                                                "CTableGuard!")
         try:
-
+            # print("~~~~~ Query meta. :", self.c_table_name)
             # *** Получим курсор
             l_meta_cursor = self.c_connection.cursor()
             # *** Получим выборку
@@ -132,6 +138,7 @@ class CTableGuard():
             # *** Получим кол-во строк
             l_rows = len(l_meta_data)
             # *** если выборка не пустая...
+            # print("~~~~~ Meta rows: ", l_rows)
             if l_rows > 0:
 
                 for l_meta_row in l_meta_data:
@@ -164,6 +171,7 @@ class CTableGuard():
                                      "set_query_for_insert]: "
                                      "No <p_query> parameter specified!")
 
+        # print("==== insert query: ", p_query)
         self.c_source_query = p_query
 
     def set_field_list(self, p_field_list):
@@ -181,6 +189,7 @@ class CTableGuard():
         # *** Получим метаданные выбранной таблицы
         if self.__query_metadata():
 
+            # print("~~~~ Meta")
             # *** Откроем выборку для загрузки в контролы
             return self.__reopen_source_query()
         return False
@@ -200,7 +209,11 @@ class CTableGuard():
                                           "get_string_field_max_length]:"
                                           "No <pi_field_idx> parameter "
                                           "specified!")
+        # print("~~~~~~ Field list: ", self.c_field_list)
+        # print("~~~~~~ Field types: ", self.c_field_types)
         ls_field_name = self.c_field_list[pi_field_idx]
+        # print("~~~~~~ Field idx: ", pi_field_idx)
+        # print("~~~~~~ Field name: ", ls_field_name)
         if self.c_field_types[ls_field_name] == FIELD_TYPE_VARCHAR:
 
             return self.c_field_widthes[ls_field_name]
