@@ -79,6 +79,7 @@ class CWTFGuard(tguard.CTableGuard):
 
             lo_validators.append(DataRequired(FIELD_IS_REQUIRED))
         li_length = self.get_string_field_max_length(pi_field_idx)
+        # print(f"^^^^^^^^^^^^^^ Max Len: {li_length}")
         if li_length > 0:
 
             lo_validators.append(Length(max=li_length,
