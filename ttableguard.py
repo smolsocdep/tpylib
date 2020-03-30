@@ -116,10 +116,10 @@ class CTableGuard():
             return False, ("При обращении к базе данных возникла "
                            "исключительная ситуация: ")+str(ex.pgerror)
 
-    def __query_metadata(self):
+    def query_metadata(self):
         """Получает данные о полях заданной таблицы."""
         assert self.c_field_list is not None, ("Assert: [CTableGuard."
-                                               "__query_metadata]:"
+                                               "query_metadata]:"
                                                "No field list was defined in "
                                                "CTableGuard!")
         try:
@@ -187,7 +187,7 @@ class CTableGuard():
     def prepare(self):
         """Получает данные из БД."""
         # *** Получим метаданные выбранной таблицы
-        if self.__query_metadata():
+        if self.query_metadata():
 
             # print("~~~~ Meta")
             # *** Откроем выборку для загрузки в контролы
