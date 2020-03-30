@@ -100,6 +100,7 @@ class CTableGuard():
             # print("~~~~ Fields: ", l_fields)
             l_query = self.c_source_query.format(l_fields)
             # print("~~~~ Query: ", l_query)
+            # print("~~~~ ID: ", self.c_id_value)
             if self.c_id_value is not None:
                 l_param = dict(p_id=self.c_id_value)
                 # print("~~~~ Params: ", l_param)
@@ -122,7 +123,6 @@ class CTableGuard():
                                                "No field list was defined in "
                                                "CTableGuard!")
         try:
-            # print("~~~~~ Query meta. :", self.c_table_name)
             # *** Получим курсор
             l_meta_cursor = self.c_connection.cursor()
             # *** Получим выборку
@@ -147,8 +147,8 @@ class CTableGuard():
 
                         self.c_field_types[l_meta_row[0]] = l_meta_row[1]
                         self.c_field_widthes[l_meta_row[0]] = l_meta_row[2]
-            return True, ""
-
+                return True, ""
+            return False, f"Таблица {self.c_table_name} не существует!"
         except psycopg2.Error as ex:  # noqa
 
             return False, (f"!!! При обращении к базе данных возникла "
