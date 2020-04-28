@@ -45,8 +45,8 @@ import datetime
 import psycopg2
 
 from tpylib import ttableguard as tguard
-from wtforms import StringField, DateField
-from wtforms.validators import DataRequired, Length
+#from wtforms import StringField, DateField
+#from wtforms.validators import DataRequired, Length
 
 
 FIELD_IS_REQUIRED = "Поле должно быть заполнено"
@@ -208,7 +208,7 @@ class CWTFGuard(tguard.CTableGuard):
             p_date_edit.setDate(self.c_source_data[0][p_field_idx])
 
 
-def get_field_max_length_from_db(po_connection, ps_table_name, ps_field_name):
+def get_field_max_len(po_connection, ps_table_name, ps_field_name):
     """Получает данные о полях заданной таблицы."""
     assert po_connection is not None, ("Assert: "
                                        "[get_field_max_length_from_db]:"
@@ -241,8 +241,8 @@ def get_field_max_length_from_db(po_connection, ps_table_name, ps_field_name):
             return lo_meta_data[0][0], ""
     except psycopg2.Error as ex:  # noqa
 
-        return False, (f"!!! При обращении к базе данных возникла "
-                       "исключительная ситуация !!! : {ex}:{ex.pgerror}")
+        return None, (f"!!! При обращении к базе данных возникла "
+                      "исключительная ситуация !!! : {ex}:{ex.pgerror}")
 
 
 def read_values_from_table(po_connection, ps_sql, po_field_list, pi_id=None):
@@ -265,7 +265,7 @@ def read_values_from_table(po_connection, ps_sql, po_field_list, pi_id=None):
 
         # tmsg.error_occured()
         return None, ("При обращении к базе данных возникла "
-                      "исключительная ситуация: ")+str(ex.pgerror)
+                      "исключительная ситуация: ") + str(ex.pgerror)
 
 
 # def load_data_into_line_edit(po_field, pi_id):
