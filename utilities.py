@@ -27,10 +27,10 @@ def date_check_and_convert(ps_date):
 
     try:
 
-        return datetime.strptime(ps_date, '%Y-%m-%d')  # noqa
+        return datetime.strptime(ps_date, '%Y-%m-%d'), ""  # noqa
     except ValueError:
 
-        return None
+        return None, "Ошибка: Дата введена неверно, перепроверьте дату."
 
 
 def is_date_between_limits(pdt_low_limit, pdt_high_limit, pdt_date):
@@ -47,3 +47,13 @@ def is_date_between_limits(pdt_low_limit, pdt_high_limit, pdt_date):
 
         return False, f"Ошибка: дата должна быть меньше или равна {pdt_high_limit:%d.%m.%Y}"
     return True, ""
+
+
+def is_date_valid(pdt_date, pdt_date_begin):
+    assert pdt_date is not None, ("Assert: [is_date_valid]:"
+                                  "No <pdt_date> parameter specified!")
+
+    ldt_date, ls_message = date_check_and_convert(pdt_date)
+    if ldt_date is not None:
+        return is_date_between_limits(pdt_date_begin, datetime.now().date(), ldt_date)
+    return False, ls_message

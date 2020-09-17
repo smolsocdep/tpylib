@@ -27,7 +27,7 @@ def read_fields_max_lengths(po_connection, ps_table_name):
         lo_meta_cursor.execute(ls_sql, ldc_parameters)
         # *** Получим длину поля
         lo_meta_data = lo_meta_cursor.fetchall()
-        if lo_meta_data is not None:
+        if len(lo_meta_data) > 0:
 
             for row in lo_meta_data:
 
