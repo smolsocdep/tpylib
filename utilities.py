@@ -1,4 +1,4 @@
-""" Различные полезные функции """
+"""Различные полезные функции."""
 import hashlib
 from datetime import datetime
 
@@ -11,6 +11,7 @@ def create_md5(ps_line, ps_salt):
 
         return hashlib.md5(bytes(ps_line + ps_salt, "ANSI")).hexdigest()
     else:
+
         return hashlib.md5(bytes(ps_line, "ANSI")).hexdigest()
 
 
@@ -50,6 +51,7 @@ def is_date_between_limits(pdt_low_limit, pdt_high_limit, pdt_date):
 
 
 def is_date_valid(pdt_date, pdt_date_begin):
+    """Проверяет дату на валидность."""
     assert pdt_date is not None, ("Assert: [is_date_valid]:"
                                   "No <pdt_date> parameter specified!")
 
@@ -57,3 +59,15 @@ def is_date_valid(pdt_date, pdt_date_begin):
     if ldt_date is not None:
         return is_date_between_limits(pdt_date_begin, datetime.now().date(), ldt_date)
     return False, ls_message
+
+
+def split_line_ex(ps_input_line, po_lengths):
+    """Разбивает строку по заданным длинам."""
+    lo_result = list()
+    li_shift = 0
+    for flen in po_lengths:
+
+        lo_result.append(ps_input_line[li_shift:li_shift + flen])
+        li_shift += flen
+    lo_result.append(ps_input_line[li_shift:])
+    return lo_result
