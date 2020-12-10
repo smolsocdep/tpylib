@@ -1,7 +1,7 @@
 """Различные полезные функции."""
 
 import hashlib
-from datetime import datetime
+from datetime import datetime #  ,  date
 
 RUSSIAN_DATETIME_FORMAT  = "%d.%m.%Y %H:%M:%S"
 RUSSIAN_DATE_FORMAT  = "%d.%m.%Y"
@@ -51,6 +51,29 @@ def datestring2date(pdatestring,  pformat = COMMON_DATETIME_FORMAT):
         return None
 
 
+def datetime2date(pdatetime):
+    """Конвертит дату со временем в дату.
+    >>> datetime2date(datetime(2020, 12, 31, 23, 59, 59))
+    datetime.date(2020, 12, 31)
+    >>> datetime2date(datetime(2020, 12, 31))
+    datetime.date(2020, 12, 31)
+    """
+
+    if is_datetime(pdatetime):
+        
+        return pdatetime.date()
+    return pdatetime
+
+
+def is_datetime(pdate):
+    """Определяет, является ли параметр датой со временем.
+    >>> is_datetime(datetime(2020, 12, 31, 23, 59, 59))
+    True
+    >>> is_datetime(datetime(2020, 12, 31).date())
+    False
+    """
+    return type(pdate) is datetime
+
 
 def is_string_empty(ps_line):
     """Возвращает True, если строка содержит None либо пустую строку.
@@ -62,6 +85,8 @@ def is_string_empty(ps_line):
     False
     """
     return (ps_line is None) or not bool(str(ps_line)) or not bool(str(ps_line.strip()))
+
+
 
 
 def date_check_and_convert(ps_date):
@@ -80,16 +105,8 @@ def date_check_and_convert(ps_date):
 
         return None, "Ошибка: Дата введена неверно, перепроверьте дату."
 
-def datetime2date(pdatetime):
-    """Конвертит дату со временем в дату."""
 
-    if type(pdatetime) is not datetime:
-        
-        return pdatetime
-    return pdatetime.date()
-
-
-def is_date_between_limits(pdt_low_limit, pdt_high_limit, pdt_date):
+def is_date_between_limits(plowlimitdate, phighlimitdate, ptestingdate):
     """Производит валидацию даты в заданном диапазоне.
     >>> is_date_between_limits( datetime(2020, 12, 1, 0, 0), datetime(2020, 12, 31, 0, 0), datetime(2019, 12, 31, 0, 0))  # doctest: +ELLIPSIS
     (False, ...)
@@ -98,17 +115,19 @@ def is_date_between_limits(pdt_low_limit, pdt_high_limit, pdt_date):
     >>> is_date_between_limits( datetime(2020, 12, 1, 0, 0), datetime(2020, 12, 31, 0, 0), datetime(2021, 1, 1, 0, 0))  # doctest: +ELLIPSIS
     (False, ...)
     """
-    assert pdt_low_limit is not None, ("Assert: [is_date_between_limits]: No <pdt_low_limit> parameter specified!")
-    assert pdt_high_limit is not None, ("Assert: [is_date_between_limits]: No <pdt_high_limit> parameter specified!")
-    assert pdt_date is not None, ("Assert: [is_date_between_limits]: No <pdt_date> parameter specified!")
+    assert plowlimitdate is not None, ("Assert: [tpylib:utilities:is_date_between_limits]: No <plowlimitdate> parameter specified!")
+    assert phighlimitdate is not None, ("Assert: [tpylib:utilities:is_date_between_limits]: No <phighlimitdate> parameter specified!")
+    assert ptestingdate is not None, ("Assert: [tpylib:utilities:is_date_between_limits]: No <pdt_date> parameter specified!")
+   
 
-    if datetime2date(pdt_date) < datetime2date(pdt_low_limit):
+    #if is_datetime(plowlimitdate) and is_datetime(phighlimitdate) and is_datetime(ptestingdate):
+    if datetime2date(ptestingdate) < datetime2date(plowlimitdate):
 
-        return False, f"Ошибка: дата должна быть больше, чем {pdt_low_limit:%d.%m.%Y}"
+        return False, "Ошибка: дата должна быть больше, чем " + date2datestring(plowlimitdate,RUSSIAN_DATE_FORMAT)
 
-    elif datetime2date(pdt_date) > datetime2date(pdt_high_limit):
+    elif datetime2date(ptestingdate) > datetime2date(phighlimitdate):
 
-        return False, f"Ошибка: дата должна быть меньше или равна {pdt_high_limit:%d.%m.%Y}"
+        return False, "Ошибка: дата должна быть меньше или равна " + date2datestring(phighlimitdate,RUSSIAN_DATE_FORMAT)
     return True, ""
 
 
@@ -140,6 +159,20 @@ def split_line_ex(ps_input_line, po_lengths):
     lo_result.append(ps_input_line[li_shift:])
     return lo_result
 
-if __name__ == "__main__":
-    print(datestring2date('31.12.2020', RUSSIAN_DATE_FORMAT))
-    print(datestring2date('2020-20-31 23:59:59', COMMON_DATETIME_FORMAT))
+#if __name__ == "__main__":
+    #print(datestring2date('31.12.2020', RUSSIAN_DATE_FORMAT))
+    #print(datestring2date('2020-20-31 23:59:59', COMMON_DATETIME_FORMAT))
+    #print(is_date_between_limits(datetime(2020, 12, 1, 0, 0), datetime(2020, 12, 31, 0, 0), datetime(2020, 12, 31, 0, 0)))
+    #d = datestring2date('2020-20-31 23:59:59', COMMON_DATETIME_FORMAT)
+#    d = datetime(2020, 12, 31, 23, 59, 59)
+#    print(d)
+#    print(type(d))
+#    if type(d) is datetime:
+#        print("************************")
+#    if is_date(d):
+#        print("++++++++++++++++++++++++++")
+#    d = d.date()
+#    print(d)
+#    print(type(d))
+#    if is_date(d):
+#        print("++++++++++++++++++++++++++")#
