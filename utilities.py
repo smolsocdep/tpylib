@@ -3,10 +3,12 @@
 import hashlib
 from datetime import datetime #  ,  date
 
+import datetime as dt
+
 COMMON_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 COMMON_DATE_FORMAT = "%Y-%m-%d"
-RUSSIAN_DATETIME_FORMAT  = "%d.%m.%Y %H:%M:%S"
-RUSSIAN_DATE_FORMAT  = "%d.%m.%Y"
+RUSSIAN_DATETIME_FORMAT = "%d.%m.%Y %H:%M:%S"
+RUSSIAN_DATE_FORMAT = "%d.%m.%Y"
 
 
 def create_md5(ps_line, ps_salt):
@@ -21,12 +23,10 @@ def create_md5(ps_line, ps_salt):
     if ps_salt is not None:
 
         return hashlib.md5(bytes(ps_line + ps_salt, "ANSI")).hexdigest()
-    else:
-
-        return hashlib.md5(bytes(ps_line, "ANSI")).hexdigest()
+    return hashlib.md5(bytes(ps_line, "ANSI")).hexdigest()
 
 
-def date2datestring(pdate,  pformat = COMMON_DATETIME_FORMAT):
+def date2datestring(pdate, pformat=COMMON_DATETIME_FORMAT):
     """Преобразовывает дату в строковое представление даты.
     >>> date2datestring(datetime(2020, 12, 31, 23, 59, 59), COMMON_DATETIME_FORMAT)
     '2020-12-31 23:59:59'
@@ -34,7 +34,7 @@ def date2datestring(pdate,  pformat = COMMON_DATETIME_FORMAT):
     return pdate.strftime(pformat)
 
 
-def datestring2date(pdatestring,  pformat = COMMON_DATETIME_FORMAT):
+def datestring2date(pdatestring, pformat=COMMON_DATETIME_FORMAT):
     """Преобразовывает дату в строке в дату.
     >>> datestring2date('31.12.2020', RUSSIAN_DATE_FORMAT)
     datetime.datetime(2020, 12, 31, 0, 0)
@@ -44,10 +44,10 @@ def datestring2date(pdatestring,  pformat = COMMON_DATETIME_FORMAT):
     True
     """
     try:
-        
+
         return datetime.strptime(pdatestring, pformat)
     except ValueError:
-        
+
         return None
 
 
@@ -60,7 +60,7 @@ def datetime2date(pdatetime):
     """
 
     if is_datetime(pdatetime):
-        
+
         return pdatetime.date()
     return pdatetime
 
@@ -87,25 +87,6 @@ def is_string_empty(ps_line):
     return (ps_line is None) or not bool(str(ps_line)) or not bool(str(ps_line.strip()))
 
 
-
-
-#def date_check_and_convert(ps_date):
-#    """Проверяет корректность строковой даты и конвертит собственно в тип date.
-#    >>> date_check_and_convert("2020-12-31")
-#    (datetime.datetime(2020, 12, 31, 0, 0), '')
-#    >>> date_check_and_convert("2020-12-") # doctest: +ELLIPSIS
-#    (None, ...)
-#    """
-#    assert ps_date is not None, ("Assert: [utilities:date_check_and_convert]: No <ps_date> parameter specified!")
-#
-#    try:
-#
-#        return datetime.strptime(ps_date, '%Y-%m-%d'), ""  # noqa
-#    except ValueError:
-#
-#        return None, "Ошибка: Дата введена неверно, перепроверьте дату."
-
-
 def is_date_in_range(pdatefrom, pdateto, ptestingdate):
     """Производит валидацию даты в заданном диапазоне.
     >>> is_date_in_range( datetime(2020, 12, 1, 0, 0), datetime(2020, 12, 31, 0, 0), datetime(2019, 12, 31, 0, 0))  # doctest: +ELLIPSIS
@@ -118,34 +99,23 @@ def is_date_in_range(pdatefrom, pdateto, ptestingdate):
     assert pdatefrom is not None, ("Assert: [tpylib:utilities:is_date_in_range]: No <plowlimitdate> parameter specified!")
     assert pdateto is not None, ("Assert: [tpylib:utilities:is_date_in_range]: No <pdateto> parameter specified!")
     assert ptestingdate is not None, ("Assert: [tpylib:utilities:is_date_in_range]: No <pdt_date> parameter specified!")
-   
 
-    #if is_datetime(plowlimitdate) and is_datetime(pdateto) and is_datetime(ptestingdate):
     if datetime2date(ptestingdate) < datetime2date(pdatefrom):
 
-        return False, "Ошибка: дата должна быть больше или равна " + date2datestring(pdatefrom,RUSSIAN_DATE_FORMAT)
+        return False, "Ошибка: дата должна быть больше или равна " + date2datestring(pdatefrom, RUSSIAN_DATE_FORMAT)
 
-    elif datetime2date(ptestingdate) > datetime2date(pdateto):
+    if datetime2date(ptestingdate) > datetime2date(pdateto):
 
-        return False, "Ошибка: дата должна быть меньше или равна " + date2datestring(pdateto,RUSSIAN_DATE_FORMAT)
+        return False, "Ошибка: дата должна быть меньше или равна " + date2datestring(pdateto, RUSSIAN_DATE_FORMAT)
     return True, ""
 
 
-#def is_date_valid(pdt_date, pdt_date_begin):
-#    """Проверяет дату на валидность.
-#    >> is_date_valid( datetime(2020, 12, 31, 0, 0), datetime(2020, 1, 1, 0, 0))  # doctest: +ELLIPSIS
-#    (False, ...)
-#    >> is_date_valid( datetime(2020, 12, 1, 0, 0), datetime(2020, 1, 1, 0, 0))  # doctest: +ELLIPSIS
-#    (False, ...)
-#    """
-#    assert pdt_date is not None, ("Assert: [is_date_valid]:"
-#                                  "No <pdt_date> parameter specified!")
-#
-#    ldt_date, ls_message = date_check_and_convert(pdt_date)
-#    if ldt_date is not None:
-#        
-#        return is_date_between_limits(pdt_date_begin, datetime.now().date(), ldt_date)
-#    return False, ls_message
+def shift_date(pdate, pdays):
+    """Смещает дату на заданный интервал.
+    >>> shift_date(dt.date(2021, 1, 1), 31)
+    datetime.date(2021, 2, 1)"""
+    time_delta = dt.timedelta(days=pdays)
+    return pdate+time_delta
 
 
 def split_line_ex(ps_input_line, po_lengths):
@@ -161,22 +131,3 @@ def split_line_ex(ps_input_line, po_lengths):
         li_shift += flen
     lo_result.append(ps_input_line[li_shift:])
     return lo_result
-
-
-#if __name__ == "__main__":
-    #print(datestring2date('31.12.2020', RUSSIAN_DATE_FORMAT))
-    #print(datestring2date('2020-20-31 23:59:59', COMMON_DATETIME_FORMAT))
-    #print(is_date_between_limits(datetime(2020, 12, 1, 0, 0), datetime(2020, 12, 31, 0, 0), datetime(2020, 12, 31, 0, 0)))
-    #d = datestring2date('2020-20-31 23:59:59', COMMON_DATETIME_FORMAT)
-#    d = datetime(2020, 12, 31, 23, 59, 59)
-#    print(d)
-#    print(type(d))
-#    if type(d) is datetime:
-#        print("************************")
-#    if is_date(d):
-#        print("++++++++++++++++++++++++++")
-#    d = d.date()
-#    print(d)
-#    print(type(d))
-#    if is_date(d):
-#        print("++++++++++++++++++++++++++")#
