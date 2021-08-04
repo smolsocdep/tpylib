@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Различные полезные функции."""
 
 import hashlib
@@ -22,8 +23,8 @@ def create_md5(ps_line, ps_salt):
 
     if ps_salt is not None:
 
-        return hashlib.md5(bytes(ps_line + ps_salt, "ANSI")).hexdigest()
-    return hashlib.md5(bytes(ps_line, "ANSI")).hexdigest()
+        return hashlib.md5(bytes(ps_line + ps_salt, "utf_8")).hexdigest()
+    return hashlib.md5(bytes(ps_line, "utf_8")).hexdigest()
 
 
 def date2datestring(pdate, pformat=COMMON_DATETIME_FORMAT):

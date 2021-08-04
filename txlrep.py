@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Модуль роутинга главной страницы. """  # noqa
 
-from openpyxl import Workbook
+# from openpyxl import Workbook
 from openpyxl import styles as xlstyles
 
 THIN_BORDER_STYLE = xlstyles.Side(border_style="thin", color="000000")
@@ -9,6 +9,33 @@ TOP_BORDER = xlstyles.Border(top=THIN_BORDER_STYLE)
 BOTTOM_BORDER = xlstyles.Border(bottom=THIN_BORDER_STYLE)
 LEFT_BORDER = xlstyles.Border(left=THIN_BORDER_STYLE)
 RIGHT_BORDER = xlstyles.Border(right=THIN_BORDER_STYLE)
+
+COLUMN_A = 1
+COLUMN_B = 2
+COLUMN_C = 3
+COLUMN_D = 4
+COLUMN_E = 5
+COLUMN_F = 6
+COLUMN_G = 7
+COLUMN_H = 8
+COLUMN_I = 9
+COLUMN_J = 10
+COLUMN_K = 11
+COLUMN_L = 12
+COLUMN_M = 13
+COLUMN_N = 14
+COLUMN_O = 15
+COLUMN_P = 16
+COLUMN_Q = 17
+COLUMN_R = 18
+COLUMN_S = 19
+COLUMN_T = 20
+COLUMN_U = 21
+COLUMN_V = 22
+COLUMN_W = 23
+COLUMN_X = 24
+COLUMN_Y = 25
+COLUMN_Z = 26
 
 
 def write_in_cell(psheet, pcell, pvalue, pfont, palign):
@@ -42,7 +69,7 @@ def write_in_cell_by_row_col(psheet, prow, pcolumn, pvalue, pfont, palign):
     assert pcolumn is not None, ("Assert: [txlrep:write_in_cell_by_row_col]:"
                                  "No <pcolumn> parameter specified!")
     assert pvalue is not None, ("Assert: [txlrep:write_in_cell_by_row_col]:"
-                                "No <pwhat> parameter specified!")
+                                "No <pvalue> parameter specified!")
     assert pfont is not None, ("Assert: [txlrep:write_in_cell_by_row_col]:"
                                "No <pfont> parameter specified!")
     assert palign is not None, ("Assert: [txlrep:write_in_cell_by_row_col]:"
