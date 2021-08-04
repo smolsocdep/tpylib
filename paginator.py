@@ -1,8 +1,17 @@
+# -*- coding: utf-8 -*-
+""" Модуль пагинатора"""
 
+SESSION_CURRENT_FRAME_KEY = "current_frame"
+SESSION_CURRENT_PAGE_KEY = "current_page"
+FIRST_FRAME_CONTROL = "first_frame"
+PREV_FRAME_CONTROL = "prev_frame"
+NEXT_FRAME_CONTROL = "next_frame"
+LAST_FRAME_CONTROL = "last_frame"
 FULL_FRAME_SIZE = 10
 FULL_PAGE_SIZE = 25
+RECORDS_IN_FULL_FRAME = FULL_FRAME_SIZE * FULL_PAGE_SIZE
 
-def paginator_recalc(records_count):
+def recalc(records_count):
     """Процедура производит расчёт параметров пагинатора."""
     assert records_count is not None, ("Assert: [paginator:pager_recalc]: No "
                                        "<records_count> parameter specified!")
@@ -12,15 +21,16 @@ def paginator_recalc(records_count):
     partial_frame_size = 0
     partial_page_flag = False
     partial_page_size = 0
+
     # *** Найдём к-во полных фреймов
-     full_frames_total= (records_count // (FULL_FRAME_SIZE * FULL_PAGE_SIZE))
-    li_full_frames_records = (full_frames_total* FULL_FRAME_SIZE * FULL_PAGE_SIZE)
+    full_frames_total = int(records_count // RECORDS_IN_FULL_FRAME)
+    # li_full_frames_records = (full_frames_total * RECORDS_IN_FULL_FRAME)
     # *** Если к-во записей не делится нацело на к-во записей во фрейме
-    if records_count % (FULL_PAGE_SIZE * FULL_FRAME_SIZE) > 0:
+    if records_count % RECORDS_IN_FULL_FRAME > 0:
         # *** Добавим неполный фрейм
         partial_frame_flag = True
         # *** Посчитаем, сколько записей будет в последнем, неполном фрейме
-        partial_frame_records = records_count - li_full_frames_records
+        partial_frame_records = records_count - (full_frames_total * RECORDS_IN_FULL_FRAME)  # li_full_frames_records
         # *** Рассчитаем к-во страниц в последнем фрейме
         partial_frame_size = int(partial_frame_records / FULL_PAGE_SIZE)
     # *** Если к-во зап. в выборке не делится нацело на к-во зап. на странице
@@ -30,47 +40,46 @@ def paginator_recalc(records_count):
         partial_page_flag = True
         # *** Рассчитаем к-во записей на последней странице ???
         partial_page_size = (partial_frame_records - partial_frame_size * FULL_PAGE_SIZE)
-    return li_frames, li_part_frame, partial_frame_size, \
-        li_part_page, partial_page_size
+    return full_frames_total, partial_frame_flag, partial_frame_size, partial_page_flag, partial_page_size
 
 
-def pager_route(records_count):
+def route(prequest, precords_count):
     """Процедура обрабатывает нажатия кнопок пейджера."""
-    assert records_count is not None, ("Assert: [pager_route]: No "
-                                    "<records_count> parameter specified!")
-     full_frames_total= (records_count // (FULL_FRAME_SIZE * FULL_PAGE_SIZE))
-    if request.form.get(wa_const.INDEX_CONTROL_FIRST_FRAME):
+    assert precords_count is not None, ("Assert: [paginator:route]: No "
+                                        "<precords_count> parameter specified!")
+    full_frames_total= (precords_count // RECORDS_IN_FULL_FRAME)
+    if prequest.form.get(FIRST_FRAME_CONTROL):
 
         # *** Переходим на первый фрейм
-        session[wa_const.INDEX_SESSION_KEY_FRAME_NUMBER] = 0
-        session[wa_const.INDEX_SESSION_KEY_PAGE_NUMBER] = 0
-    elif request.form.get(wa_const.INDEX_CONTROL_PREV_FRAME):
+        session[SESSION_CURRENT_FRAME_KEY] = 0
+        session[SESSION_CURRENT_PAGE_KEY] = 0
+    elif prequest.form.get(PREV_FRAME_CONTROL):
 
         # *** Переходим на предыдущий фрейм
-        session[wa_const.INDEX_SESSION_KEY_FRAME_NUMBER] -= 1
-        session[wa_const.INDEX_SESSION_KEY_PAGE_NUMBER] = 0
-    elif request.form.get(wa_const.INDEX_CONTROL_NEXT_FRAME):
+        session[SESSION_CURRENT_FRAME_KEY] -= 1
+        session[SESSION_CURRENT_PAGE_KEY] = 0
+    elif prequest.form.get(NEXT_FRAME_CONTROL):
 
         # *** Переходим на следующий фрейм
-        session[wa_const.INDEX_SESSION_KEY_FRAME_NUMBER] += 1
-        session[wa_const.INDEX_SESSION_KEY_PAGE_NUMBER] = 0
-    elif request.form.get(wa_const.INDEX_CONTROL_LAST_FRAME):
+        session[SESSION_CURRENT_FRAME_KEY] += 1
+        session[SESSION_CURRENT_PAGE_KEY] = 0
+    elif prequest.form.get(LAST_FRAME_CONTROL):
 
         # *** Переходим на последний фрейм
-        session[wa_const.INDEX_SESSION_KEY_FRAME_NUMBER] = li_frames
-        session[wa_const.INDEX_SESSION_KEY_PAGE_NUMBER] = 0
+        session[SESSION_CURRENT_FRAME_KEY] = full_frames_total
+        session[SESSION_CURRENT_PAGE_KEY] = 0
     else:
 
-        li_offset = 0
+        page_offset = 0
         # *** Перебираем страницы
-        for li_page in range(0, FULL_FRAME_SIZE):
+        for page in range(0, FULL_FRAME_SIZE):
 
             # *** Ищем нажатую
-            if request.form.get(f"page{li_page}"):
+            if prequest.form.get(f"page{page}"):
 
                 # *** Нашли. Обрабатываем.
-                li_offset = int(request.form.get(f"page{li_page}")) - 1
-                session[wa_const.INDEX_SESSION_KEY_PAGE_NUMBER] = li_page
+                page_offset = int(prequest.form.get(f"page{page}")) - 1
+                session[SESSION_CURRENT_PAGE_KEY] = page
                 break
-        return li_offset
-    return (session[wa_const.INDEX_SESSION_KEY_FRAME_NUMBER] * FULL_FRAME_SIZE * FULL_PAGE_SIZE)
+        return page_offset
+    return (session[SESSION_CURRENT_FRAME_KEY] * RECORDS_IN_FULL_FRAME)
