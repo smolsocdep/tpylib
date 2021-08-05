@@ -11,36 +11,36 @@ FULL_FRAME_SIZE = 10
 FULL_PAGE_SIZE = 25
 RECORDS_IN_FULL_FRAME = FULL_FRAME_SIZE * FULL_PAGE_SIZE
 
-def recalc(records_count):
+def recalc(precords_count):
     """Процедура производит расчёт параметров пагинатора."""
-    assert records_count is not None, ("Assert: [paginator:pager_recalc]: No "
-                                       "<records_count> parameter specified!")
+    assert precords_count is not None, ("Assert: [paginator:pager_recalc]: No "
+                                        "<precords_count> parameter specified!")
 
-    partial_frame_records = 0
     partial_frame_flag = False
-    partial_frame_size = 0
+    records_in_partial_frame = 0
+    pages_in_partial_frame = 0
     partial_page_flag = False
-    partial_page_size = 0
+    records_in_partial_page = 0
 
     # *** Найдём к-во полных фреймов
-    full_frames_total = int(records_count // RECORDS_IN_FULL_FRAME)
+    full_frames_total = int(precords_count // RECORDS_IN_FULL_FRAME)
     # li_full_frames_records = (full_frames_total * RECORDS_IN_FULL_FRAME)
     # *** Если к-во записей не делится нацело на к-во записей во фрейме
-    if records_count % RECORDS_IN_FULL_FRAME > 0:
+    if precords_count % RECORDS_IN_FULL_FRAME > 0:
         # *** Добавим неполный фрейм
         partial_frame_flag = True
         # *** Посчитаем, сколько записей будет в последнем, неполном фрейме
-        partial_frame_records = records_count - (full_frames_total * RECORDS_IN_FULL_FRAME)  # li_full_frames_records
+        records_in_partial_frame = precords_count - (full_frames_total * RECORDS_IN_FULL_FRAME)  # li_full_frames_records
         # *** Рассчитаем к-во страниц в последнем фрейме
-        partial_frame_size = int(partial_frame_records / FULL_PAGE_SIZE)
+        pages_in_partial_frame = int(records_in_partial_frame / FULL_PAGE_SIZE)
     # *** Если к-во зап. в выборке не делится нацело на к-во зап. на странице
-    if records_count % FULL_PAGE_SIZE > 0:
+    if precords_count % FULL_PAGE_SIZE > 0:
 
-        # *** Увеличиваем к-во страниц в неполном фрейме на 1
+        # *** Выставляем флаг неполной страницы
         partial_page_flag = True
         # *** Рассчитаем к-во записей на последней странице ???
-        partial_page_size = (partial_frame_records - partial_frame_size * FULL_PAGE_SIZE)
-    return full_frames_total, partial_frame_flag, partial_frame_size, partial_page_flag, partial_page_size
+        records_in_partial_page = (records_in_partial_frame - pages_in_partial_frame * FULL_PAGE_SIZE)
+    return full_frames_total, partial_frame_flag, pages_in_partial_frame, partial_page_flag, records_in_partial_page
 
 
 def route(prequest, precords_count):
