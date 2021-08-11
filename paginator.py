@@ -1,26 +1,28 @@
 # -*- coding: utf-8 -*-
 """ Модуль пагинатора"""
 
-SESSION_CURRENT_FRAME_KEY = "current_frame"
-SESSION_CURRENT_PAGE_KEY = "current_page"
-FIRST_FRAME_CONTROL = "first_frame"
-PREV_FRAME_CONTROL = "prev_frame"
-NEXT_FRAME_CONTROL = "next_frame"
-LAST_FRAME_CONTROL = "last_frame"
-FULL_FRAME_SIZE = 10
-FULL_PAGE_SIZE = 25
-RECORDS_IN_FULL_FRAME = FULL_FRAME_SIZE * FULL_PAGE_SIZE
+from flask import session
 
-def recalc(precords_count):
+SESSION_CURRENT_FRAME_KEY: str = "current_frame"
+SESSION_CURRENT_PAGE_KEY: str = "current_page"
+FIRST_FRAME_CONTROL: str = "first_frame"
+PREV_FRAME_CONTROL: str = "prev_frame"
+NEXT_FRAME_CONTROL: str = "next_frame"
+LAST_FRAME_CONTROL: str = "last_frame"
+FULL_FRAME_SIZE: int = 10
+FULL_PAGE_SIZE: int = 25
+RECORDS_IN_FULL_FRAME: int = FULL_FRAME_SIZE * FULL_PAGE_SIZE
+
+def recalc(precords_count: int) -> int, int, int, int, int:
     """Процедура производит расчёт параметров пагинатора."""
     assert precords_count is not None, ("Assert: [paginator:pager_recalc]: No "
                                         "<precords_count> parameter specified!")
 
-    partial_frame_flag = False
-    records_in_partial_frame = 0
-    pages_in_partial_frame = 0
-    partial_page_flag = False
-    records_in_partial_page = 0
+    partial_frame_flag: bool = False
+    records_in_partial_frame: int = 0
+    pages_in_partial_frame: int = 0
+    partial_page_flag: bool = False
+    records_in_partial_page: int = 0
 
     # *** Найдём к-во полных фреймов
     full_frames_total = int(precords_count // RECORDS_IN_FULL_FRAME)
@@ -43,11 +45,12 @@ def recalc(precords_count):
     return full_frames_total, partial_frame_flag, pages_in_partial_frame, partial_page_flag, records_in_partial_page
 
 
-def route(prequest, precords_count):
+def route(prequest: object, precords_count: int) -> int:
     """Процедура обрабатывает нажатия кнопок пейджера."""
     assert precords_count is not None, ("Assert: [paginator:route]: No "
                                         "<precords_count> parameter specified!")
-    full_frames_total= (precords_count // RECORDS_IN_FULL_FRAME)
+    # print("*** PGN:RT:req ", prequest)
+    full_frames_total: int = precords_count // RECORDS_IN_FULL_FRAME
     if prequest.form.get(FIRST_FRAME_CONTROL):
 
         # *** Переходим на первый фрейм
