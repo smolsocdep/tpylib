@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """ Модуль пагинатора"""
 
+import typing as tpn
+
 from flask import session
 
 SESSION_CURRENT_FRAME_KEY: str = "current_frame"
@@ -13,7 +15,7 @@ FULL_FRAME_SIZE: int = 10
 FULL_PAGE_SIZE: int = 25
 RECORDS_IN_FULL_FRAME: int = FULL_FRAME_SIZE * FULL_PAGE_SIZE
 
-def recalc(precords_count: int) -> int, int, int, int, int:
+def recalc(precords_count: int) -> tpn.Tuple[int, int, int, int, int]:
     """Процедура производит расчёт параметров пагинатора."""
     assert precords_count is not None, ("Assert: [paginator:pager_recalc]: No "
                                         "<precords_count> parameter specified!")
@@ -85,4 +87,4 @@ def route(prequest: object, precords_count: int) -> int:
                 session[SESSION_CURRENT_PAGE_KEY] = page
                 break
         return page_offset
-    return (session[SESSION_CURRENT_FRAME_KEY] * RECORDS_IN_FULL_FRAME)
+    return session[SESSION_CURRENT_FRAME_KEY] * RECORDS_IN_FULL_FRAME

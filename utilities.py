@@ -73,7 +73,7 @@ def is_datetime(pdate):
     >>> is_datetime(datetime(2020, 12, 31).date())
     False
     """
-    return type(pdate) is datetime
+    return isinstance(pdate, datetime)
 
 
 def is_string_empty(ps_line):

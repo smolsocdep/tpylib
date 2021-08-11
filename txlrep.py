@@ -38,7 +38,8 @@ COLUMN_Y = 25
 COLUMN_Z = 26
 
 
-def write_in_cell(psheet, pcell, pvalue, pfont, palign):
+# def write_in_cell(psheet, pcell, pvalue, pfont, palign):
+def write_in_cell(psheet, pcell, pvalue, pattributes):
     """Выводит в заданную ячейку значение."""
     assert psheet is not None, ("Assert: [txlrep:write_in_cell]:"
                                 "No <psheet> parameter specified!")
@@ -46,13 +47,11 @@ def write_in_cell(psheet, pcell, pvalue, pfont, palign):
                                "No <pcell> parameter specified!")
     assert pvalue is not None, ("Assert: [txlrep:write_in_cell]:"
                                 "No <pwhat> parameter specified!")
-    assert pfont is not None, ("Assert: [txlrep:write_in_cell]:"
-                               "No <pfont> parameter specified!")
-    assert palign is not None, ("Assert: [txlrep:write_in_cell]:"
-                                "No <palign> parameter specified!")
+    assert pattributes is not None, ("Assert: [txlrep:write_in_cell]:"
+                                     "No <pattributes> parameter specified!")
     cell = psheet[pcell]
-    cell.alignment = palign
-    cell.font = pfont
+    cell.alignment = pattributes["align"]
+    cell.font = pattributes["font"]
     cell.value = pvalue
     return cell
 
@@ -60,28 +59,26 @@ def write_in_cell(psheet, pcell, pvalue, pfont, palign):
 # py lint: disable=too-many-statements
 # py lint: disable=too-many-locals
 # py lint: disable=too-many-arguments
-def write_in_cell_by_row_col(psheet, prow, pcolumn, pvalue, pfont, palign):
+# def write_in_cell_by_row_col(psheet, prow, pcolumn, pvalue, pfont, palign):
+def write_in_cell_by_row_col(psheet, pcoordinates, pvalue, pattributes):
     """Выводит в заданную ячейку значение."""
     assert psheet is not None, ("Assert: [txlrep:write_in_cell_by_row_col]:"
                                 "No <psheet> parameter specified!")
-    assert prow is not None, ("Assert: [txlrep:write_in_cell_by_row_col]:"
-                              "No <prow> parameter specified!")
-    assert pcolumn is not None, ("Assert: [txlrep:write_in_cell_by_row_col]:"
-                                 "No <pcolumn> parameter specified!")
+    assert pcoordinates is not None, ("Assert: [txlrep:write_in_cell_by_row_col]:"
+                                      "No <pcoordinates> parameter specified!")
     assert pvalue is not None, ("Assert: [txlrep:write_in_cell_by_row_col]:"
                                 "No <pvalue> parameter specified!")
-    assert pfont is not None, ("Assert: [txlrep:write_in_cell_by_row_col]:"
-                               "No <pfont> parameter specified!")
-    assert palign is not None, ("Assert: [txlrep:write_in_cell_by_row_col]:"
-                                "No <palign> parameter specified!")
-    cell = psheet.cell(column=pcolumn, row=prow)
-    cell.alignment = palign
-    cell.font = pfont
+    assert pattributes is not None, ("Assert: [txlrep:write_in_cell_by_row_col]:"
+                                     "No <pattributes> parameter specified!")
+    cell = psheet.cell(column=pcoordinates["column"], row=pcoordinates["row"])
+    cell.alignment = pattributes["align"]
+    cell.font = pattributes["font"]
     cell.value = pvalue
     return cell
 
 
-def merge_and_write(psheet, pfrom, pto, pvalue, pfont, palign):
+# def merge_and_write(psheet, pfrom, pto, pvalue, pfont, palign):
+def merge_and_write(psheet, pfrom, pto, pvalue, pattributes):
     """Объединяет ячейки и выводит информацию в них."""
     assert psheet is not None, ("Assert: [txlrep:merge_and_write]:"
                                 "No <psheet> parameter specified!")
@@ -91,14 +88,12 @@ def merge_and_write(psheet, pfrom, pto, pvalue, pfont, palign):
                              "No <pto> parameter specified!")
     assert pvalue is not None, ("Assert: [txlrep:merge_and_write]:"
                                 "No <pvalue> parameter specified!")
-    assert pfont is not None, ("Assert: [txlrep:merge_and_write]:"
-                               "No <pfont> parameter specified!")
-    assert palign is not None, ("Assert: [txlrep:merge_and_write]:"
-                                "No <palign> parameter specified!")
+    assert pattributes is not None, ("Assert: [txlrep:merge_and_write]:"
+                                     "No <pattributes> parameter specified!")
     psheet.merge_cells(pfrom + ":" + pto)
     cell = psheet[pfrom]
-    cell.alignment = palign
-    cell.font = pfont
+    cell.alignment = pattributes["align"]
+    cell.font = pattributes["font"]
     cell.value = pvalue
     return cell
 
@@ -159,7 +154,6 @@ def frame_cell(pcell, ptop=None, pleft=None, pbottom=None,
     """Рисует прямоугольник вокруг ячейки."""
     assert pcell is not None, ("Assert: [txlrep:frame_cell]:"
                                "No <pcell> parameter specified!")
-    """Задает границы ячейки."""
     if ptop:
 
         pcell.border = pcell.border + ptop
