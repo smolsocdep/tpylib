@@ -3,6 +3,8 @@
 
 import typing as tpn
 
+# from pprint import pprint
+
 from flask import session
 
 SESSION_CURRENT_FRAME_KEY: str = "current_frame"
@@ -15,8 +17,15 @@ FULL_FRAME_SIZE: int = 10
 FULL_PAGE_SIZE: int = 25
 RECORDS_IN_FULL_FRAME: int = FULL_FRAME_SIZE * FULL_PAGE_SIZE
 
-def recalc(precords_count: int) -> tpn.Tuple[int, int, int, int, int]:
-    """Процедура производит расчёт параметров пагинатора."""
+def recalc(precords_count: int) -> tpn.Tuple[int, int, int, int]:
+    """Процедура производит расчёт параметров пагинатора.
+    >>> recalc(88)
+    (0, True, 3, True)
+    >>> recalc(5550)
+    (22, True, 2, False)
+    >>> recalc(2000)
+    (8, False, 0, False)
+    """
     assert precords_count is not None, ("Assert: [paginator:pager_recalc]: No "
                                         "<precords_count> parameter specified!")
 
@@ -24,34 +33,41 @@ def recalc(precords_count: int) -> tpn.Tuple[int, int, int, int, int]:
     records_in_partial_frame: int = 0
     pages_in_partial_frame: int = 0
     partial_page_flag: bool = False
-    records_in_partial_page: int = 0
+    # records_in_partial_page: int = 0
 
     # *** Найдём к-во полных фреймов
     full_frames_total = int(precords_count // RECORDS_IN_FULL_FRAME)
     # li_full_frames_records = (full_frames_total * RECORDS_IN_FULL_FRAME)
     # *** Если к-во записей не делится нацело на к-во записей во фрейме
-    if precords_count % RECORDS_IN_FULL_FRAME > 0:
+    # print(precords_count % RECORDS_IN_FULL_FRAME)
+    records_in_partial_frame = precords_count % RECORDS_IN_FULL_FRAME
+    # print(records_in_partial_frame)
+    if records_in_partial_frame > 0:
         # *** Добавим неполный фрейм
+        # print("* Partial frame")
         partial_frame_flag = True
         # *** Посчитаем, сколько записей будет в последнем, неполном фрейме
-        records_in_partial_frame = precords_count - (full_frames_total * RECORDS_IN_FULL_FRAME)  # li_full_frames_records
+        # records_in_partial_frame = precords_count - (full_frames_total * RECORDS_IN_FULL_FRAME)  # li_full_frames_records
+        # print(records_in_partial_frame)
         # *** Рассчитаем к-во страниц в последнем фрейме
         pages_in_partial_frame = int(records_in_partial_frame / FULL_PAGE_SIZE)
+        #print(pages_in_partial_frame)
     # *** Если к-во зап. в выборке не делится нацело на к-во зап. на странице
-    if precords_count % FULL_PAGE_SIZE > 0:
+    partial_page_flag = precords_count % FULL_PAGE_SIZE > 0
+    # if precords_count % FULL_PAGE_SIZE > 0:
+    # *** Выставляем флаг неполной страницы
+    # partial_page_flag = True
+    # *** Рассчитаем к-во записей на последней странице ???
+    # records_in_partial_page = (records_in_partial_frame - pages_in_partial_frame * FULL_PAGE_SIZE)
+    return full_frames_total, partial_frame_flag, pages_in_partial_frame, partial_page_flag  # , records_in_partial_page
 
-        # *** Выставляем флаг неполной страницы
-        partial_page_flag = True
-        # *** Рассчитаем к-во записей на последней странице ???
-        records_in_partial_page = (records_in_partial_frame - pages_in_partial_frame * FULL_PAGE_SIZE)
-    return full_frames_total, partial_frame_flag, pages_in_partial_frame, partial_page_flag, records_in_partial_page
-
-
+# werkzeug.local.LocalProxy
 def route(prequest: object, precords_count: int) -> int:
     """Процедура обрабатывает нажатия кнопок пейджера."""
     assert precords_count is not None, ("Assert: [paginator:route]: No "
                                         "<precords_count> parameter specified!")
-    # print("*** PGN:RT:req ", prequest)
+    #print("*** PGN:RT:req ", type(prequest), prequest)
+    #pprint(prequest)
     full_frames_total: int = precords_count // RECORDS_IN_FULL_FRAME
     if prequest.form.get(FIRST_FRAME_CONTROL):
 
@@ -88,3 +104,9 @@ def route(prequest: object, precords_count: int) -> int:
                 break
         return page_offset
     return session[SESSION_CURRENT_FRAME_KEY] * RECORDS_IN_FULL_FRAME
+
+if __name__ == '__main__':
+
+    print(recalc(88))
+    print(recalc(5550))
+    print(recalc(2000))

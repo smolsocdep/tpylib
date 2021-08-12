@@ -4,11 +4,11 @@
 # from openpyxl import Workbook
 from openpyxl import styles as xlstyles
 
-THIN_BORDER_STYLE = xlstyles.Side(border_style="thin", color="000000")
-TOP_BORDER = xlstyles.Border(top=THIN_BORDER_STYLE)
-BOTTOM_BORDER = xlstyles.Border(bottom=THIN_BORDER_STYLE)
-LEFT_BORDER = xlstyles.Border(left=THIN_BORDER_STYLE)
-RIGHT_BORDER = xlstyles.Border(right=THIN_BORDER_STYLE)
+THIN_BORDER_STYLE: object = xlstyles.Side(border_style="thin", color="000000")
+TOP_BORDER: object = xlstyles.Border(top=THIN_BORDER_STYLE)
+BOTTOM_BORDER: object = xlstyles.Border(bottom=THIN_BORDER_STYLE)
+LEFT_BORDER: object = xlstyles.Border(left=THIN_BORDER_STYLE)
+RIGHT_BORDER: object = xlstyles.Border(right=THIN_BORDER_STYLE)
 
 COLUMN_A = 1
 COLUMN_B = 2
@@ -58,7 +58,6 @@ def write_in_cell(psheet, pcell, pvalue, pattributes):
 
 # py lint: disable=too-many-statements
 # py lint: disable=too-many-locals
-# py lint: disable=too-many-arguments
 # def write_in_cell_by_row_col(psheet, prow, pcolumn, pvalue, pfont, palign):
 def write_in_cell_by_row_col(psheet, pcoordinates, pvalue, pattributes):
     """Выводит в заданную ячейку значение."""
